@@ -17,6 +17,16 @@ app.post("/addStudentDetails", async (req, resp) => {
   }
 })
 
+app.get("/fetchLoginData", async (req, resp) => {
+  try {
+    let result = await Student.find()
+    console.log(result)
+    resp.send(result)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 app.post("/createLogin", async (req, resp) => {
   try {
     let data = new Login(req.body)

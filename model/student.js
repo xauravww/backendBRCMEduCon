@@ -17,6 +17,9 @@ const studentsSchema = new mongoose.Schema({
 export default mongoose.model("studentsMain", studentsSchema)
 
 /* sample data
+
+/addStudentDetails
+
 {
   "name": "John Doe",
   "rollNo": 12345,
