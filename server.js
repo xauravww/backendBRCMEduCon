@@ -1,35 +1,31 @@
 import express from "express"
 import "./config.js"
-import Product from "./product.js"
+import Student from "./model/student.js"
+import Login from "./model/login.js"
 
 const app = express()
 app.use(express.json())
 
-app.post("/create", async (req, resp) => {
-  let data = new Product(req.body)
-  let result = await data.save()
-  console.log(result)
-  resp.send("Done")
+app.post("/addStudentDetails", async (req, resp) => {
+  try {
+    let data = new Student(req.body)
+    let result = await data.save()
+    console.log(result)
+    resp.send("Done")
+  } catch (error) {
+    console.log(error)
+  }
 })
 
-app.get("/list", async (req, resp) => {
-  let data = await Product.find()
-  console.log(data)
-  resp.send(data)
-})
-
-app.delete("/delete/:_id", async (req, resp) => {
-  const data = await Product.deleteOne(req.params)
-
-  resp.send(data)
-})
-
-app.put("/delete/:_id", async (req, resp) => {
-  const data = await Product.updateOne(req.params, {
-    $set: req.body
-  })
-
-  resp.send(data)
+app.post("/createLogin", async (req, resp) => {
+  try {
+    let data = new Login(req.body)
+    let result = await data.save()
+    console.log(result)
+    resp.send("Done")
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 app.listen(5000)
