@@ -11,6 +11,9 @@ const loginSchema = new mongoose.Schema({
 export default mongoose.model("loginMain", loginSchema)
 
 /* sample data
+
+/createLogin
+
 {
   "email": "user@example.com",
   "phone": 5555555555,
