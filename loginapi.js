@@ -1,4 +1,5 @@
-import Student from "./model/student"
+const Student = require("./model/student");
+
 
 // Login API endpoint
 app.post("/login", async (req, res) => {
