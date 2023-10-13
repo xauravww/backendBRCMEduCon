@@ -31,9 +31,8 @@ app.use("/api/v1", attendance);
 app.use("/api/v1", status);
 app.use("/api/v1", assignment);
 app.use("/api/v1", idCrad);
-// app.use("/api/v1", event);
-
-// app.use("/api/v1", gallery);
+app.use("/api/v1", event);
+app.use("/api/v1", gallery);
 
 // Middleware for Errors
 app.use(errorMiddleware);
