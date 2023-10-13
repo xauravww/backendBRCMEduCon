@@ -5,6 +5,12 @@ This README provides an overview of the BRCMApi, including API endpoints and gui
 ## API Endpoints
 
 ### Register a member
+### Login a member
+### Create a Status
+### Create Attendance
+### Assignment
+### Event
+
 
 **Method:** POST : **Endpoint:** `http://localhost:4000/api/v1/register`
 
