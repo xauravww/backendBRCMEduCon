@@ -34,7 +34,7 @@ This README provides an overview of the BRCMApi, including API endpoints and gui
 
 ### Login a member
 
-**Method:** POST : Endpoint: http://localhost:4000/api/v1/login
+**Method:** POST : **Endpoint:** : http://localhost:4000/api/v1/login
     
 
 **Data:**
@@ -47,7 +47,7 @@ This README provides an overview of the BRCMApi, including API endpoints and gui
 
 
 ### Create a Status
-Method: POST : Endpoint: http://localhost:4000/api/v1/admin/status
+Method: POST : **Endpoint:** : http://localhost:4000/api/v1/admin/status
 
    
 
@@ -67,14 +67,14 @@ Data:
             "attendancePercentage": 85
         }
 # Delete Status
-Method: DELETE : Endpoint: http://localhost:4000/api/v1/admin/status/id
+Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/admin/status/id
 
 (Replace id with the actual status ID you want to delete)
 
 
 
 # Update Status
-Method: PUT  : Endpoint: http://localhost:4000/api/v1/admin/status/id
+Method: PUT  : **Endpoint:** : http://localhost:4000/api/v1/admin/status/id
 (Replace id with the actual status ID you want to update)
 Data:
 
@@ -93,12 +93,12 @@ Data:
         }
 
 Get All Status
-Method: GET  : Endpoint: http://localhost:4000/api/v1/admin/status/
+Method: GET  : **Endpoint:** : http://localhost:4000/api/v1/admin/status/
 
 
 
 ### Create Attendance
-Method: POST : Endpoint: http://localhost:4000/api/v1/faculty/attendance
+Method: POST : **Endpoint:** : http://localhost:4000/api/v1/faculty/attendance
 
 Data:
 
@@ -118,7 +118,7 @@ Method: DELETE
 (Replace _id with the actual attendance ID you want to delete)
 
 # Update Attendance
-Method: PUT : Endpoint: http://localhost:4000/api/v1/faculty/attendance/_id
+Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/faculty/attendance/_id
 
 Data:
 
@@ -135,14 +135,14 @@ Data:
 (Replace _id with the actual attendance ID you want to update)
 
 # Get All Attendance
-Method: GET : Endpoint: http://localhost:4000/api/v1/faculty/attendance/
+Method: GET : **Endpoint:** : http://localhost:4000/api/v1/faculty/attendance/
 
     
 
 ### Gallery
-Method: GET : Endpoint: http://localhost:4000/api/v1/gallery
+Method: GET : **Endpoint:** : http://localhost:4000/api/v1/gallery
 
-Method: POST : Endpoint: http://localhost:4000/api/v1/admin/gallery
+Method: POST : **Endpoint:** : http://localhost:4000/api/v1/admin/gallery
 Data:
 
  ```json body 
@@ -154,11 +154,11 @@ Data:
         }
 
 
-Method: DELETE : Endpoint: http://localhost:4000/api/v1/admin/gallery/id
+Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/admin/gallery/id
 (Replace _id with the actual attendance ID you want to update)
 
 
-Method: PUT : Endpoint: http://localhost:4000/api/v1/admin/gallery/id
+Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/admin/gallery/id
 (Replace _id with the actual attendance ID you want to update)
 Data:
 
@@ -173,9 +173,9 @@ Data:
 
 
 ### Events
-Method: GET : Endpoint : http://localhost:4000/api/v1/events
+Method: GET : **Endpoint:** : http://localhost:4000/api/v1/events
 
-Method: POST : Endpoint : http://localhost:4000/api/v1/admin/event
+Method: POST : **Endpoint:** : http://localhost:4000/api/v1/admin/event
  Data:
 
  ```json body
@@ -190,11 +190,11 @@ Method: POST : Endpoint : http://localhost:4000/api/v1/admin/event
         }
 
 
-Method: DELETE : Endpoint : http://localhost:4000/api/v1/admin/event/id
+Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/admin/event/id
 (Replace _id with the actual attendance ID you want to update)
 
 
-Method: PUT : Endpoint : http://localhost:4000/api/v1/admin/event/id
+Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/admin/event/id
 (Replace _id with the actual attendance ID you want to update)
 Data:
 
@@ -212,9 +212,9 @@ Data:
 
 ### Assignment
 
-Method: GET : Endpoint : http://localhost:4000/api/v1/faculty/assignment
+Method: GET : **Endpoint:** : http://localhost:4000/api/v1/faculty/assignment
 
-Method: POST : Endpoint : http://localhost:4000/api/v1/faculty/assignment
+Method: POST : **Endpoint:** : http://localhost:4000/api/v1/faculty/assignment
 (Replace _id with the actual attendance ID you want to update)
 Data:
 
@@ -240,12 +240,12 @@ Data:
         }
 
 
-Method: DELETE : Endpoint : http://localhost:4000/api/v1/faculty/assignment/id
+Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/faculty/assignment/id
 (Replace _id with the actual attendance ID you want to update)
 
 
 
-Method: PUT : Endpoint : http://localhost:4000/api/v1/faculty/assignment/id
+Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/faculty/assignment/id
 (Replace _id with the actual attendance ID you want to update)
 Data:
 
