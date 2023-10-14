@@ -55,7 +55,7 @@ This README provides an overview of the BRCMApi, including API endpoints and gui
 ### Create a Status
 Method: POST : **Endpoint:** : http://localhost:4000/api/v1/admin/status
 
-   
+
 
 Data:
 
@@ -70,10 +70,17 @@ Data:
             "fine": 100,
             "bookBank": 300,
             "title": "Submit Your Due before 31 July",
-            "attendancePercentage": 85
+            "attendancePercentage": 85,
+            "token": "token__here"
         }
 # Delete Status
 Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/admin/status/id
+Data:
+
+ ```json body
+        {
+        "token": "token__here"
+        }
 
 (Replace id with the actual status ID you want to delete)
 
@@ -95,7 +102,8 @@ Data:
             "fine": 100,
             "bookBank": 300,
             "title": "Submit Your Due before 31 July",
-            "attendancePercentage": 85
+            "attendancePercentage": 85,
+            "token": "token__here"
         }
 
 Get All Status
@@ -114,14 +122,20 @@ Data:
             "memberId": "652637158cc7e023bc6baff3",  
             "date": "2023-10-10T12:00:00.000Z",
             "status": "present",
-            "remarks": "sick leave"
+            "remarks": "sick leave",
+            "token": "token__here"
         }
 # Delete Attendance
 Method: DELETE
 
     Endpoint: http://localhost:4000/api/v1/faculty/attendance/_id
-
 (Replace _id with the actual attendance ID you want to delete)
+Data:
+
+ ```json body
+        {
+        "token": "token__here"
+        }
 
 # Update Attendance
 Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/faculty/attendance/_id
@@ -134,7 +148,8 @@ Data:
             "memberId": "652637158cc7e023bc6baff3",  
             "date": "2023-10-10T12:00:00.000Z",
             "status": "present",
-            "remarks": "sick leave"
+            "remarks": "sick leave",
+            "token": "token__here"
         }
 
 
@@ -156,13 +171,19 @@ Data:
         "image": "https://example.com/gallery/image1.jpg",
         "description": "Brcm Alumi",
         "tags": ["alumi", "Placement", "2023"],
-        "dateOfUpload": "2023-10-10T12:00:00.000Z"
+        "dateOfUpload": "2023-10-10T12:00:00.000Z",
+        "token": "token__here"
         }
 
 
 Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/admin/gallery/id
 (Replace _id with the actual attendance ID you want to update)
+Data:
 
+ ```json body
+        {
+        "token": "token__here"
+        }
 
 Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/admin/gallery/id
 (Replace _id with the actual attendance ID you want to update)
@@ -173,7 +194,8 @@ Data:
         "image": "https://example.com/gallery/image1.jpg",
         "description": "Brcm Alumi",
         "tags": ["alumi", "Placement", "2023"],
-        "dateOfUpload": "2023-10-10T12:00:00.000Z"
+        "dateOfUpload": "2023-10-10T12:00:00.000Z",
+        "token": "token__here"
         }
 
 
@@ -192,13 +214,19 @@ Method: POST : **Endpoint:** : http://localhost:4000/api/v1/admin/event
         "lastdate": "2023-11-17T18:00:00.000Z",
         "forSemester": "all",
         "organisedBy": "Tech Community Association",
-        "image": "company.jpg"
+        "image": "company.jpg",
+        "token": "token__here"
         }
 
 
 Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/admin/event/id
 (Replace _id with the actual attendance ID you want to update)
+Data:
 
+ ```json body
+        {
+        "token": "token__here"
+        }
 
 Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/admin/event/id
 (Replace _id with the actual attendance ID you want to update)
@@ -212,7 +240,8 @@ Data:
         "lastdate": "2023-11-17T18:00:00.000Z",
         "forSemester": "all",
         "organisedBy": "Tech Community Association",
-        "image": "company.jpg"
+        "image": "company.jpg",
+        "token": "token__here"
         }
 
 
@@ -242,13 +271,19 @@ Data:
         "lateSubmission": true,
         "priority": "Medium",
         "tags": ["dsa", "assignment"],
-        "semester": "3rd"
+        "semester": "3rd",
+        "token": "token__here"
         }
 
 
 Method: DELETE : **Endpoint:** : http://localhost:4000/api/v1/faculty/assignment/id
 (Replace _id with the actual attendance ID you want to update)
+Data:
 
+ ```json body
+        {
+        "token": "token__here"
+        }
 
 
 Method: PUT : **Endpoint:** : http://localhost:4000/api/v1/faculty/assignment/id
@@ -273,5 +308,6 @@ Data:
         "lateSubmission": true,
         "priority": "Medium",
         "tags": ["dsa", "assignment"],
-        "semester": "3rd"
+        "semester": "3rd",
+        "token": "token__here"
         }
