@@ -1,5 +1,5 @@
 const CollegeStatus = require('../model/collegeStatus');
-// const ErrorHander = require("../utils/errorhander");
+const ErrorHandler = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 // Create College Status

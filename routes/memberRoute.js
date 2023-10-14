@@ -28,20 +28,20 @@ router.route("/login").post(loginMember);
 // router.route("/logout").get(logout);
 
 router.route("/me").get(
-  // isAuthenticatedUser,
+  isAuthenticatedUser,
    getUserDetails);
 
 router.route("/password/update").put(
-  // isAuthenticatedUser,
+  isAuthenticatedUser,
    updatePassword);
 
 router.route("/admin/me/update").put(
-  // isAuthenticatedUser,
+  isAuthenticatedUser,
    updateProfile);
 
-// router
-//   .route("/admin/users")
-//   .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUser);
+router
+  .route("/admin/members")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUser);
 
 router
   .route("/admin/user/:id")

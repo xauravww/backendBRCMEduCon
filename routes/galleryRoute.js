@@ -15,16 +15,16 @@ router.route("/gallery").get(getAllGalleryImages);
 router
 .route("/admin/gallery")
 .post(
-// isAuthenticatedUser, authorizeRoles("admin"), 
+isAuthenticatedUser, authorizeRoles("admin"), 
 createGalleryImage);
 
 router
   .route("/admin/gallery/:id")
   .put(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      updateGalleryImage)
   .delete(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      deleteGalleryImage);
 
 module.exports = router;
