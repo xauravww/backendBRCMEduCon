@@ -15,16 +15,16 @@ router.route("/events").get(getAllEvents);
 router
 .route("/admin/event")
 .post(
-// isAuthenticatedUser, authorizeRoles("admin"), 
+isAuthenticatedUser, authorizeRoles("admin"), 
 createEvent);
 
 router
   .route("/admin/event/:id")
   .put(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      updateEvent)
   .delete(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      deleteEvent);
 
 module.exports = router;

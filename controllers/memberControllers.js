@@ -139,19 +139,17 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
 // Get User Detail
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
-  const user = await Member.findById("65295b1f3eaf85530c73e9c5");
+  const member = await Member.findById(req.member.id).select("+pass");
 
   res.status(200).json({
     success: true,
-    user,
+    member,
   });
 });
 
 // update User password
 exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
-  const member = await Member.findById("65295b1f3eaf85530c73e9c5").select("+pass");
-  //  const user = await Member.findById(req.user.id).select("+password");
-
+  const member = await Member.findById(req.member.id).select("+pass");
 
   const isPasswordMatched = await member.comparePassword(req.body.oldPassword);
 

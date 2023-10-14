@@ -16,22 +16,22 @@ router.route("/student/id-card/:rollNo").get(getIDCardByRollNo);
 router
 .route("/admin/id-card")
 .post(
-// isAuthenticatedUser, authorizeRoles("admin"), 
+isAuthenticatedUser, authorizeRoles("admin"), 
 createIDCard);
 
 router
   .route("/admin/id-card")
   .get(
-    // isAuthenticatedUser, authorizeRoles("admin"), 
+    isAuthenticatedUser, authorizeRoles("admin"), 
     getAllIDCards);
 
 router
   .route("/admin/id-card/:id")
   .put(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      updateIDCard)
   .delete(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      deleteIDCard);
 
 module.exports = router;

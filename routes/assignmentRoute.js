@@ -9,7 +9,9 @@ const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.route("/faculty/assignment").post(createAssignment);
+router.route("/faculty/assignment").post(
+      isAuthenticatedUser, authorizeRoles("admin"), 
+createAssignment);
 
 router
   .route("/faculty/assignment")
@@ -20,10 +22,10 @@ router
 router
   .route("/faculty/assignment/:id")
   .put(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      updateAssignment)
   .delete(
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, authorizeRoles("admin"),
      deleteAssignment);
 
 module.exports = router;
