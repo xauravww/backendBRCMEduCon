@@ -23,6 +23,7 @@ const gallery = require("./routes/galleryRoute");
 const event = require("./routes/eventRoute");
 const idCrad = require("./routes/idCardRoute");
 const assignment = require("./routes/assignmentRoute");
+const timeTable = require("./routes/timeTableRoute");
 
 
 app.use(require("cors")());
@@ -33,6 +34,7 @@ app.use("/api/v1", assignment);
 app.use("/api/v1", idCrad);
 app.use("/api/v1", event);
 app.use("/api/v1", gallery);
+app.use("/api/v1", timeTable);
 
 // Middleware for Errors
 app.use(errorMiddleware);
