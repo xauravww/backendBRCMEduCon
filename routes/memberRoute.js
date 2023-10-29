@@ -12,6 +12,7 @@ const {
   getSingleUser,
   updateUserRole,
   deleteUser,
+  verifyUser,
 } = require("../controllers/memberControllers");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
@@ -34,6 +35,10 @@ router.route("/me").get(
 router.route("/password/update").put(
   isAuthenticatedUser,
    updatePassword);
+
+router.route("/admin/verify").put(
+  isAuthenticatedUser,
+   verifyUser);
 
 router.route("/admin/me/update").put(
   isAuthenticatedUser,

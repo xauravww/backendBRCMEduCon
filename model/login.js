@@ -48,10 +48,15 @@ const loginSchema = new mongoose.Schema({
   },       
   
   imageurl: {
-    type: String,
-    default: ""
-  },        
-  
+    public_id: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },       
+  },
   address: {
     type: String,
     default: ""
@@ -81,7 +86,10 @@ const loginSchema = new mongoose.Schema({
     type: Number,
     default: 0
   }, 
-  
+  verified: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
