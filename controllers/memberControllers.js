@@ -7,33 +7,54 @@ const crypto = require("crypto");
 const cloudinary = require("cloudinary");
 
 // Register a User
-  // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-  //   folder: "avatars",
-  //   width: 150,
-  //   crop: "scale",
-  // });
 
-  exports.registerMember = catchAsyncErrors(async (req, res, next) => {
 
-    const {
-      email,phone,countryCode,pass,role,
-      createdAt,rollno,name,semester,
-      imageurl,address,batchYear,
-      fathername,registrationNo,dateOfBirth,age}= req.body;
-      // creating member 
-    const member = await Member.create({
-
-      email,phone,countryCode,pass,
-      role,rollno,name,semester,imageurl,
-      address,batchYear,fathername,
-      registrationNo,dateOfBirth,age,createdAt
-   
-    });
-  //send responce with token
-    sendToken(member, 201, res);
+exports.registerMember = catchAsyncErrors(async (req, res, next) => {
+  const myCloud = await cloudinary.v2.uploader.upload(req.body.photo, {
+    folder: "BRCMImg",
+    width: 150,
+    crop: "scale",
   });
-  
-  
+  const {
+    email, phone, countryCode, pass, role,
+    createdAt, rollno, name, semester,
+    address, batchYear,
+    fathername, registrationNo, dateOfBirth, age } = req.body;
+  // creating member 
+  const member = await Member.create({
+
+    email, phone, countryCode, pass,
+    role, rollno, name, semester, imageurl: {
+      public_id: myCloud.public_id,
+      url: myCloud.secure_url,
+    },
+    address, batchYear, fathername,
+    registrationNo, dateOfBirth, age, createdAt
+
+  });
+  //send responce with token
+  sendToken(member, 201, res);
+});
+
+exports.verifyUser = catchAsyncErrors(async (req, res, next) => {
+  // Find the user based on the provided email
+  const user = await Member.findOne({ email: req.body.email });
+
+  // Check if the user is found
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  // Update the 'verified' field based on the data in the request body
+  user.verified = req.body.verified;
+  // Save the updated user object
+  await user.save();
+
+  // Send the response with the updated user object
+  sendToken(user, 201, res);
+});
+
+
 
 // Login Member
 exports.loginMember = catchAsyncErrors(async (req, res, next) => {
@@ -191,15 +212,15 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
   // if (req.body.avatar !== "") {
   //   const user = await Member.findById(req.user.id);
 
-    // const imageId = user.avatar.public_id;
+  // const imageId = user.avatar.public_id;
 
-    // await cloudinary.v2.uploader.destroy(imageId);
+  // await cloudinary.v2.uploader.destroy(imageId);
 
-    // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-    //   folder: "avatars",
-    //   width: 150,
-    //   crop: "scale",
-    // });
+  // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+  //   folder: "avatars",
+  //   width: 150,
+  //   crop: "scale",
+  // });
 
   //   newUserData.avatar = {
   //     public_id: myCloud.public_id,
