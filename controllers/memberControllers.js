@@ -10,7 +10,7 @@ const cloudinary = require("cloudinary");
 
 
 exports.registerMember = catchAsyncErrors(async (req, res, next) => {
-  const myCloud = await cloudinary.v2.uploader.upload(req.body.photo, {
+  const myCloud = await cloudinary.v2.uploader.upload(req.file, {
     folder: "BRCMImg",
     width: 150,
     crop: "scale",
