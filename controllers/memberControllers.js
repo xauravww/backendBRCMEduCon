@@ -40,6 +40,7 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHander("please send a image also"+error, 400));
   }
   let url ,public_id ;
+  console.log(imageFile.tempFilePath);
 
   await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
     resource_type: 'auto',folder: "BRCNImg",
