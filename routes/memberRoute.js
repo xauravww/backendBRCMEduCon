@@ -13,6 +13,7 @@ const {
   updateUserRole,
   deleteUser,
   verifyUser,
+  sample,
 } = require("../controllers/memberControllers");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const multer = require('multer');
@@ -32,6 +33,7 @@ const upload = multer({ storage: storage });
 const router = express.Router();
 
 router.route("/register").post(upload.single('photo'), registerMember);
+router.route("/sample").post(upload.single('photo'), sample);
  
 router.route("/login").post(loginMember);
 
