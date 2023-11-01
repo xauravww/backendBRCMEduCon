@@ -5,18 +5,29 @@ const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
+const fs = require('fs');
 
-// Register a User
 
 // exports.sample = catchAsyncErrors(async (req, res, next) => {
+
+//   console.log(req.files.photo);
+
 //   if (!req.files.photo) {
 //     return res.status(400).json({ error: 'No file uploaded' });
 //   }
+
 //   const imageFile = req.files.photo;
-//   const fileNmae = Date.now - req.files.photo.name;
-//   const newPath = require("path").join(process.cwd(), "test", fileNmae)
-//   req.files.photo.mv(newPath)
-//   await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
+//   // const fileNmae = Date.now - req.files.photo.name;
+//   // const newPath = require("path").join(process.cwd(), "test", fileNmae)
+//   // req.files.photo.mv(newPath)
+//   try {
+//     fs.writeFileSync('tempfile.png', imageFile.data);
+//   } catch (error) {
+//     console.error('Error writing file:', error);
+//     return res.status(500).json({ error: 'Error writing file' });
+//   }
+
+//   await cloudinary.v2.uploader.upload("tempfile.png", {
 //     resource_type: 'auto',
 //     folder: "BRCNImg",
 //     width: 150,
@@ -30,26 +41,38 @@ const cloudinary = require("cloudinary");
 //       res.json({ url: result.url });
 //     }
 //   });
-//   // console.log(imageBuffer)
+//   console.log(imageBuffer)
 //   res.json({ "success": "ok" });
 // });
 
+// Register a User
+
 exports.registerMember = catchAsyncErrors(async (req, res, next) => {
   const imageFile = req.files.photo;
+  let url, public_id;
+  console.log(req)
   if (!imageFile) {
-    return next(new ErrorHander("please send a image also"+error, 400));
+    return next(new ErrorHander("please send a image also" + error, 400));
   }
-  let url ,public_id ;
-  console.log(imageFile.tempFilePath);
-
-  await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
-    resource_type: 'auto',folder: "BRCNImg",
-    width: 150,crop: "scale",},(error, result) => {
+  // const fileNmae = Date.now - req.files.photo.name;
+  // const newPath = require("path").join(process.cwd(), "test", fileNmae)
+  // req.files.photo.mv(newPath)
+  try {
+    fs.writeFileSync('tempfile.png', imageFile.data);
+  }
+  catch (error) {
+    console.error('Error writing file:', error);
+    return next(new ErrorHander(error + ":" + 'Error writing file', 500));
+  }
+  await cloudinary.v2.uploader.upload("tempfile.png", {
+    resource_type: 'auto', folder: "BRCNImg",
+    width: 150, crop: "scale",
+  }, (error, result) => {
     if (error) {
       console.error(error);
-      return next(new ErrorHander("Error uploading image"+error, 500));
+      return next(new ErrorHander("Error uploading image" + error, 500));
     }
-     else {
+    else {
       console.log(result);
       url = result.url;
       public_id = result.public_id;
@@ -61,6 +84,8 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
     address, batchYear,
     fathername, registrationNo, dateOfBirth, age } = req.body;
   // creating member 
+  console.log(req.body.email);
+
   const member = await Member.create({
 
     email, phone, countryCode, pass,
@@ -99,7 +124,7 @@ exports.verifyUser = catchAsyncErrors(async (req, res, next) => {
 // Login Member
 exports.loginMember = catchAsyncErrors(async (req, res, next) => {
   const { email, pass } = req.body;
-
+  console.log(req)
   // checking if member has given password and email both
 
   if (!email || !pass) {
