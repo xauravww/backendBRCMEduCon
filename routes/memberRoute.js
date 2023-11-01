@@ -13,6 +13,7 @@ const {
   updateUserRole,
   deleteUser,
   verifyUser,
+  // sample,
 } = require("../controllers/memberControllers");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
@@ -21,6 +22,7 @@ const router = express.Router();
 router.route("/register").post(registerMember);
 
 router.route("/login").post(loginMember);
+// router.route("/sample").post(sample);
 
 // router.route("/password/forgot").post(forgotPassword);
 
