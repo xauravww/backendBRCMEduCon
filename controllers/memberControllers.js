@@ -53,10 +53,6 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
   console.log(file)
   const fileUri = getDataUri(file);
 
-   
-  if (!fileUri) {
-    return next(new ErrorHander("please send a image also" + error, 400));
-  }
   // const fileNmae = Date.now - req.files.photo.name;
   // const newPath = require("path").join(process.cwd(), "test", fileNmae)
   // req.files.photo.mv(newPath)
