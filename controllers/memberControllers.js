@@ -3,82 +3,67 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Member = require("../model/login");
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
+const getDataUri = require("../utils/dataUri.js");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
 const fs = require('fs');
 
 
-// exports.sample = catchAsyncErrors(async (req, res, next) => {
+exports.sample = catchAsyncErrors(async (req, res, next) => {
 
-//   console.log(req.files.photo);
+  console.log(req);
 
-//   if (!req.files.photo) {
-//     return res.status(400).json({ error: 'No file uploaded' });
-//   }
+  // if (!req.files.photo) {
+  //   return res.status(400).json({ error: 'No file uploaded' });
+  // }
 
-//   const imageFile = req.files.photo;
-//   // const fileNmae = Date.now - req.files.photo.name;
-//   // const newPath = require("path").join(process.cwd(), "test", fileNmae)
-//   // req.files.photo.mv(newPath)
-//   try {
-//     fs.writeFileSync('tempfile.png', imageFile.data);
-//   } catch (error) {
-//     console.error('Error writing file:', error);
-//     return res.status(500).json({ error: 'Error writing file' });
-//   }
+  // const imageFile = req.files.photo;
+  // // const fileNmae = Date.now - req.files.photo.name;
+  // // const newPath = require("path").join(process.cwd(), "test", fileNmae)
+  // // req.files.photo.mv(newPath)
+  // try {
+  //   fs.writeFileSync('tempfile.png', imageFile.data);
+  // } catch (error) {
+  //   console.error('Error writing file:', error);
+  //   return res.status(500).json({ error: 'Error writing file' });
+  // }
 
-//   await cloudinary.v2.uploader.upload("tempfile.png", {
-//     resource_type: 'auto',
-//     folder: "BRCNImg",
-//     width: 150,
-//     crop: "scale",
-//   }, (error, result) => {
-//     if (error) {
-//       console.error(error);
-//       res.status(500).json({ error: 'Error uploading image' + error });
-//     } else {
-//       console.log(result);
-//       res.json({ url: result.url });
-//     }
-//   });
-//   console.log(imageBuffer)
-//   res.json({ "success": "ok" });
-// });
+  // await cloudinary.v2.uploader.upload("tempfile.png", {
+  //   resource_type: 'auto',
+  //   folder: "BRCNImg",
+  //   width: 150,
+  //   crop: "scale",
+  // }, (error, result) => {
+  //   if (error) {
+  //     console.error(error);
+  //     res.status(500).json({ error: 'Error uploading image' + error });
+  //   } else {
+  //     console.log(result);
+  //     res.json({ url: result.url });
+  //   }
+  // });
+  // console.log(imageBuffer)
+  res.json({ "success": "ok" });
+});
 
 // Register a User
 
 exports.registerMember = catchAsyncErrors(async (req, res, next) => {
-  const imageFile = req.files.photo;
-  let url, public_id;
-  console.log(req)
-  if (!imageFile) {
+  const file = req.file;
+  console.log(file)
+  const fileUri = getDataUri(file);
+
+   
+  if (!fileUri) {
     return next(new ErrorHander("please send a image also" + error, 400));
   }
   // const fileNmae = Date.now - req.files.photo.name;
   // const newPath = require("path").join(process.cwd(), "test", fileNmae)
   // req.files.photo.mv(newPath)
-  try {
-    fs.writeFileSync('tempfile.png', imageFile.data);
-  }
-  catch (error) {
-    console.error('Error writing file:', error);
-    return next(new ErrorHander(error + ":" + 'Error writing file', 500));
-  }
-  await cloudinary.v2.uploader.upload("tempfile.png", {
-    resource_type: 'auto', folder: "BRCNImg",
-    width: 150, crop: "scale",
-  }, (error, result) => {
-    if (error) {
-      console.error(error);
-      return next(new ErrorHander("Error uploading image" + error, 500));
-    }
-    else {
-      console.log(result);
-      url = result.url;
-      public_id = result.public_id;
-    }
-  });
-  const {
+ 
+  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
+
+   const {
     email, phone, countryCode, pass, role,
     createdAt, rollno, name, semester,
     address, batchYear,
@@ -90,8 +75,8 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
 
     email, phone, countryCode, pass,
     role, rollno, name, semester, imageurl: {
-      public_id: public_id,
-      url: url,
+      public_id: mycloud.public_id,
+      url: mycloud.secure_url,
     },
     address, batchYear, fathername,
     registrationNo, dateOfBirth, age, createdAt

@@ -1,4 +1,5 @@
 const express = require("express");
+const singleUpload = require("../middleware/multer.js")
 const {
   registerMember,
   loginMember,
@@ -19,10 +20,10 @@ const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.route("/register").post(registerMember);
+router.route("/register").post(singleUpload,registerMember);
 
 router.route("/login").post(loginMember);
-// router.route("/sample").post(sample);
+// router.route("/sample").post(singleUpload, sample);
 
 // router.route("/password/forgot").post(forgotPassword);
 
