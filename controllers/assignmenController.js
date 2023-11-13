@@ -4,19 +4,18 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 // Create Assignment
 exports.createAssignment = catchAsyncErrors(async (req, res, next) => {
+  submitBy = []
   const {
-    title,description,givenDate,dueDate,studentName,
-    studentRollNo,teacherName,subject,status,
-    attachment,feedback,grades,submissionDate,
-    lateSubmission,priority,tags,semester} = req.body;
+    title, description, givenDate, dueDate, teacherName, subject, status,
+    attachment, feedback, grades, submissionDate,
+    lateSubmission, priority, tags, semester, branch } = req.body;
 
   const newAssignment = await Assignment.create({
-    title,description,givenDate,dueDate,studentName,
-    studentRollNo,teacherName,subject,status,
-    attachment,feedback,grades,submissionDate,
-    lateSubmission,priority,tags,semester
+    title, description, givenDate, dueDate,
+    submitBy, teacherName, subject, status,
+    attachment, feedback, grades, submissionDate,
+    lateSubmission, priority, tags, semester, branch
   });
-
   res.status(201).json({
     success: true,
     data: newAssignment
@@ -25,9 +24,48 @@ exports.createAssignment = catchAsyncErrors(async (req, res, next) => {
 
 // Update Assignment
 exports.updateAssignment = catchAsyncErrors(async (req, res, next) => {
+
   const updatedAssignment = await Assignment.findByIdAndUpdate(
     req.params.id,
     req.body,
+    { new: true, runValidators: true }
+  );
+  if (!updatedAssignment) {
+    return next(new ErrorHander('Assignment not found', 404));
+  }
+  res.status(200).json({
+    success: true,
+    data: updatedAssignment
+  });
+});
+
+// update submit Assignment by student
+exports.updateAssignmentSubmit = catchAsyncErrors(async (req, res, next) => {
+  console.log(req.body)
+  const assignmentId = req.params.id;
+  const { studentName, studentRollNo } = req.body;
+
+  const submission = {
+    studentName,
+    studentRollNo,
+    "attachment": ""
+  }
+  console.log(submission)
+  const isRollNoDifferent = await Assignment.findOne({
+    _id: assignmentId,
+    'submissions.studentRollNo': submission.studentRollNo,
+  });
+
+  if (isRollNoDifferent) {
+    return next(new ErrorHander('This Roll number already submit the assignment', 400));
+  }
+  const updatedAssignment = await Assignment.findByIdAndUpdate(
+    assignmentId,
+    {
+      $push: {
+        submissions: submission,
+      },
+    },
     { new: true, runValidators: true }
   );
   if (!updatedAssignment) {
@@ -59,3 +97,26 @@ exports.getAllAssignments = catchAsyncErrors(async (req, res, next) => {
     data: assignmentList
   });
 });
+
+// Get All Assignments with paticular branch and semester and pending those
+exports.getAllAssignmentsWithBranchAndSemester = catchAsyncErrors(async (req, res, next) => {
+  const { semester, branch, rollNo } = req.body;
+  console.log(req.body)
+  const assignmentList = await Assignment.find({
+    "semester": semester,
+    "branch": branch
+  });
+
+
+  // Remove all other roll numbers from the submissions array
+  assignmentList.forEach((assignment) => {
+    assignment.submissions = assignment.submissions.filter((submission) => submission.studentRollNo === rollNo);
+  });
+
+  // Send the filtered assignment list in the response
+  res.status(200).json({
+    success: true,
+    data: assignmentList
+  });
+});
+

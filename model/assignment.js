@@ -1,5 +1,24 @@
 const mongoose = require("mongoose");
 
+const submissionSchema = new mongoose.Schema({
+  _id: mongoose.Schema.Types.ObjectId, 
+  studentName: {
+    type: String,
+    required: true,
+  },
+  attachment: {
+    type: String,
+  },
+  submissionDate: {
+    type: Date,
+    default: Date.now,
+  },
+  studentRollNo: {
+    type: String,
+    required: true,
+    },
+});
+
 const assignmentSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -14,18 +33,22 @@ const assignmentSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  studentName: String,
-  studentRollNo: String,
-  teacherName: String,
+  submissions: [
+    {
+      type: submissionSchema,
+    },
+  ],  teacherName: String,
   subject: String,
   status: {
     type: String,
-    enum: ["pending","submitted"],
+    enum: ["pending", "submitted"],
     default: "pending"
   },
-  attachment: String,
-  feedback: String,
-  grades: Number,
+  branch: String,
+  grades: {
+    type:String,
+    default:"wait"
+  },
   submissionDate: Date,
   lateSubmission: {
     type: Boolean,

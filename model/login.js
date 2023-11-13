@@ -94,6 +94,11 @@ const loginSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  branch: {
+    type: String,
+    enum: ["Cse", "Mechanical", "Electrical","Civil","Branch"],
+    default: "Branch"
+  },
 });
 
 loginSchema.pre("save", async function (next) {

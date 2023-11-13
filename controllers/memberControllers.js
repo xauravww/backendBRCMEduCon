@@ -50,19 +50,16 @@ exports.sample = catchAsyncErrors(async (req, res, next) => {
 
 exports.registerMember = catchAsyncErrors(async (req, res, next) => {
   const file = req.file;
-  console.log(file)
+  console.log(req)
   const fileUri = getDataUri(file);
 
-  // const fileNmae = Date.now - req.files.photo.name;
-  // const newPath = require("path").join(process.cwd(), "test", fileNmae)
-  // req.files.photo.mv(newPath)
- 
+
   const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
 
    const {
     email, phone, countryCode, pass, role,
     createdAt, rollno, name, semester,
-    address, batchYear,
+    address, batchYear,branch,
     fathername, registrationNo, dateOfBirth, age } = req.body;
   // creating member 
   console.log(req.body.email);
@@ -74,7 +71,7 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
       public_id: mycloud.public_id,
       url: mycloud.secure_url,
     },
-    address, batchYear, fathername,
+    address, batchYear,branch, fathername,
     registrationNo, dateOfBirth, age, createdAt
 
   });
