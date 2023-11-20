@@ -7,11 +7,13 @@ const {
  getIDCardByRollNo
 } = require("../controllers/idCardController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const singleUpload = require("../middleware/multer");
 
 const router = express.Router();
 
 
-router.route("/student/id-card/:rollNo").get(getIDCardByRollNo);
+router.route("/student/id-card/:rollNo").post(
+   getIDCardByRollNo);
 
 router
 .route("/admin/id-card")

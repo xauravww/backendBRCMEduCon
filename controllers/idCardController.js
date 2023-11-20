@@ -5,16 +5,16 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 // Create ID Card
 exports.createIDCard = catchAsyncErrors(async (req, res, next) => {
   const {
-    name,rollno,mobileNo,
-    email,address,age,
-    batchYear,dob,
+    name, rollno, mobileNo,
+    email, address, age,
+    batchYear, dob,
     registrationNo
   } = req.body;
 
   const newIDCard = await IDCard.create({
-    name,rollno,mobileNo,
-    email,address,age,
-    batchYear,dob,
+    name, rollno, mobileNo,
+    email, address, age,
+    batchYear, dob,
     registrationNo
   });
 
@@ -64,19 +64,19 @@ exports.getAllIDCards = catchAsyncErrors(async (req, res, next) => {
 
 //get the roll no by their roll no
 exports.getIDCardByRollNo = catchAsyncErrors(async (req, res, next) => {
-    const rollNo = req.params.rollNo; // Assuming the roll number is in the URL params
-  
-    const idCard = await IDCard.findOne({ rollno: rollNo });
-  
-    if (!idCard) {
-      return res.status(404).json({
-        success: false,
-        message: 'ID card not found for the given roll number.'
-      });
-    }
-  
-    res.status(200).json({
-      success: true,
-      data: idCard
+  console.log(req)
+  const rollNo = req.params.rollNo; // Assuming the roll number is in the URL params
+  const idCard = await IDCard.findOne({ rollno: rollNo });
+
+  if (!idCard) {
+    return res.status(404).json({
+      success: false,
+      message: 'ID card not found for the given roll number.'
     });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: idCard
   });
+});

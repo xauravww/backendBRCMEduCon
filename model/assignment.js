@@ -7,7 +7,14 @@ const submissionSchema = new mongoose.Schema({
     required: true,
   },
   attachment: {
-    type: String,
+    public_id: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },       
   },
   submissionDate: {
     type: Date,
