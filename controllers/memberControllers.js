@@ -6,7 +6,6 @@ const sendEmail = require("../utils/sendEmail");
 const getDataUri = require("../utils/dataUri.js");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
-const fs = require('fs');
 
 
 exports.sample = catchAsyncErrors(async (req, res, next) => {
@@ -54,7 +53,7 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
   const fileUri = getDataUri(file);
 
 
-  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
+  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content,);
 
    const {
     email, phone, countryCode, pass, role,

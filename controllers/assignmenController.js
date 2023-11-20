@@ -1,6 +1,8 @@
 const Assignment = require('../model/assignment');
 const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const cloudinary = require("cloudinary");
+const getDataUri = require("../utils/dataUri.js");
 
 // Create Assignment
 exports.createAssignment = catchAsyncErrors(async (req, res, next) => {
@@ -41,16 +43,25 @@ exports.updateAssignment = catchAsyncErrors(async (req, res, next) => {
 
 // update submit Assignment by student
 exports.updateAssignmentSubmit = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.body)
+  const file = req.file;
+  const fileUri = getDataUri(file);
+  const uploadOptions = {
+    resource_type: 'raw', 
+    folder: 'uploaded_assignment_pdfs',
+    type: 'upload',
+  };
+  
+  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content,uploadOptions);
   const assignmentId = req.params.id;
   const { studentName, studentRollNo } = req.body;
-
   const submission = {
     studentName,
     studentRollNo,
-    "attachment": ""
+    attachment:{
+      public_id:mycloud.public_id,
+      url:mycloud.secure_url
+    }
   }
-  console.log(submission)
   const isRollNoDifferent = await Assignment.findOne({
     _id: assignmentId,
     'submissions.studentRollNo': submission.studentRollNo,
