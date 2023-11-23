@@ -1,13 +1,24 @@
 const Gallery = require('../model/gallery');
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ErrorHander = require("../utils/errorhander");
+const cloudinary = require("cloudinary");
+const getDataUri = require("../utils/dataUri.js");
 
 // Create a new image in the gallery
 exports.createGalleryImage = catchAsyncErrors(async (req, res, next) => {
-  const { image, description, tags } = req.body;
+  const {description, tags } = req.body;
+  const file = req.file;
+  console.log(req.body)
+  const fileUri = getDataUri(file);
+
+
+  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
 
   const newGalleryImage = await Gallery.create({
-    image,
+    image:{
+      public_id: mycloud.public_id,
+      url: mycloud.secure_url
+    },
     description,
     tags
   });

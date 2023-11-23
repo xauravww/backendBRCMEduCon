@@ -53,7 +53,7 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
   const fileUri = getDataUri(file);
 
 
-  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content,);
+  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
 
    const {
     email, phone, countryCode, pass, role,
