@@ -6,6 +6,7 @@ const {
   getAllGalleryImages
 } = require("../controllers/galleryController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
+const singleUpload = require("../middleware/multer.js")
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.route("/gallery").get(getAllGalleryImages);
 router
 .route("/admin/gallery")
 .post(
+singleUpload,
 isAuthenticatedUser, authorizeRoles("admin"), 
 createGalleryImage);
 
