@@ -55,10 +55,10 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
 
   const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
 
-   const {
+  const {
     email, phone, countryCode, pass, role,
     createdAt, rollno, name, semester,
-    address, batchYear,branch,
+    address, batchYear, branch,
     fathername, registrationNo, dateOfBirth, age } = req.body;
   // creating member 
   console.log(req.body.email);
@@ -70,7 +70,7 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
       public_id: mycloud.public_id,
       url: mycloud.secure_url,
     },
-    address, batchYear,branch, fathername,
+    address, batchYear, branch, fathername,
     registrationNo, dateOfBirth, age, createdAt
 
   });
@@ -78,25 +78,50 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
   sendToken(member, 201, res);
 });
 
-exports.verifyUser = catchAsyncErrors(async (req, res, next) => {
-  // Find the user based on the provided email
-  const user = await Member.findOne({ email: req.body.email });
+// exports.verifyUser = catchAsyncErrors(async (req, res, next) => {
+//   // Find the user based on the provided email
+//   const user = await Member.findOne({ email: req.body.email });
 
-  // Check if the user is found
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+//   // Check if the user is found
+//   if (!user) {
+//     return res.status(404).json({ error: 'User not found' });
+//   }
+
+//   // Update the 'verified' field based on the data in the request body
+//   user.verified = req.body.verified;
+//   // Save the updated user object
+//   await user.save();
+
+//   // Send the response with the updated user object
+//   sendToken(user, 201, res);
+// });
+
+// update and verify user by Admin
+exports.verifyMember = catchAsyncErrors(async (req, res, next) => {
+  const { id, verified } = req.body;
+
+  if (!id || verified === undefined) {
+    return next(new ErrorHander('Missing required fields (id, verified)', 400));
   }
+  await Member.findByIdAndUpdate(id, { verified }, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
 
-  // Update the 'verified' field based on the data in the request body
-  user.verified = req.body.verified;
-  // Save the updated user object
-  await user.save();
-
-  // Send the response with the updated user object
-  sendToken(user, 201, res);
+  res.status(200).json({
+    success: true,
+  });
 });
+// get Unverified user By admin to check and verify them
+exports.getAllUnverifiedMembers = catchAsyncErrors(async (req, res, next) => {
+  const unverifiedMembers = await Member.find({ verified: false });
 
-
+  res.status(200).json({
+    success: true,
+    data: unverifiedMembers,
+  });
+});
 
 // Login Member
 exports.loginMember = catchAsyncErrors(async (req, res, next) => {
@@ -325,6 +350,7 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
+
 
 // Delete User --Admin
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {

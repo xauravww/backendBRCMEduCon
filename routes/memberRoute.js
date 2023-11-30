@@ -13,14 +13,15 @@ const {
   getSingleUser,
   updateUserRole,
   deleteUser,
-  verifyUser,
+  verifyMember,
+  getAllUnverifiedMembers,
   // sample,
 } = require("../controllers/memberControllers");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.route("/register").post(singleUpload,registerMember);
+router.route("/register").post(singleUpload, registerMember);
 
 router.route("/login").post(loginMember);
 // router.route("/sample").post(singleUpload, sample);
@@ -33,23 +34,33 @@ router.route("/login").post(loginMember);
 
 router.route("/me").get(
   isAuthenticatedUser,
-   getUserDetails);
+  getUserDetails);
+
+router.route("/me").get(
+  isAuthenticatedUser,
+  getUserDetails);
 
 router.route("/password/update").put(
   isAuthenticatedUser,
-   updatePassword);
+  updatePassword);
 
 router.route("/admin/verify").put(
   isAuthenticatedUser,
-   verifyUser);
+  verifyMember);
 
 router.route("/admin/me/update").put(
   isAuthenticatedUser,
-   updateProfile);
+  updateProfile);
 
 router
   .route("/admin/members")
   .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUser);
+
+router
+  .route("/admin/members/unverified")
+  .post(
+    // isAuthenticatedUser, authorizeRoles("admin"),
+  getAllUnverifiedMembers);
 
 router
   .route("/admin/user/:id")

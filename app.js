@@ -1,9 +1,8 @@
 const express = require("express");
-const app = express();
 const bodyParser = require("body-parser");
-
 const errorMiddleware = require("./middleware/error");
 
+const app = express();
 // Config
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({ path: "config.env" });
@@ -11,9 +10,6 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(fileUpload());
-// app.use(fileUpload({useTempFiles:true,
-//   tempFileDir : 'temp/'}));
 
 // Route Imports
 const member = require("./routes/memberRoute");

@@ -6,15 +6,15 @@ const getDataUri = require("../utils/dataUri.js");
 
 // Create Assignment
 exports.createAssignment = catchAsyncErrors(async (req, res, next) => {
-  submitBy = []
+  submissions = []
   const {
-    title, description, givenDate, dueDate, teacherName, subject, status,
+    title, description, givenDate, dueDate, teacherName, teacherId, subject, status,
     attachment, feedback, grades, submissionDate,
     lateSubmission, priority, tags, semester, branch } = req.body;
 
   const newAssignment = await Assignment.create({
     title, description, givenDate, dueDate,
-    submitBy, teacherName, subject, status,
+    submissions, teacherName, teacherId, subject, status,
     attachment, feedback, grades, submissionDate,
     lateSubmission, priority, tags, semester, branch
   });
@@ -46,20 +46,20 @@ exports.updateAssignmentSubmit = catchAsyncErrors(async (req, res, next) => {
   const file = req.file;
   const fileUri = getDataUri(file);
   const uploadOptions = {
-    resource_type: 'raw', 
+    resource_type: 'raw',
     folder: 'uploaded_assignment_pdfs',
     type: 'upload',
   };
-  
-  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content,uploadOptions);
+
+  const mycloud = await cloudinary.v2.uploader.upload(fileUri.content, uploadOptions);
   const assignmentId = req.params.id;
   const { studentName, studentRollNo } = req.body;
   const submission = {
     studentName,
     studentRollNo,
-    attachment:{
-      public_id:mycloud.public_id,
-      url:mycloud.secure_url
+    attachment: {
+      public_id: mycloud.public_id,
+      url: mycloud.secure_url
     }
   }
   const isRollNoDifferent = await Assignment.findOne({
@@ -119,7 +119,7 @@ exports.getAllAssignmentsWithBranchAndSemester = catchAsyncErrors(async (req, re
   });
 
 
-  // Remove all other roll numbers from the submissions array
+  // Remove all other roll numbers from the submissions array because a student get the  assignments not the other student submissions 
   assignmentList.forEach((assignment) => {
     assignment.submissions = assignment.submissions.filter((submission) => submission.studentRollNo === rollNo);
   });
@@ -130,4 +130,64 @@ exports.getAllAssignmentsWithBranchAndSemester = catchAsyncErrors(async (req, re
     data: assignmentList
   });
 });
+
+// Get Assignments with paticular teacher id to twacher can check  
+exports.getAssignmentsToCheckByTeacherId = catchAsyncErrors(async (req, res, next) => {
+  // here rollNo is id of that teacher
+  const { rollNo } = req.body;
+  console.log(req.body)
+  const assignmentList = await Assignment.find({
+    "teacherId": rollNo
+  });
+
+
+  // Send the filtered assignment list in the response
+  res.status(200).json({
+    success: true,
+    data: assignmentList
+  });
+});
+
+//update submission
+exports.updateAssignmentSubmission = catchAsyncErrors(async (req, res, next) => {
+  const { id, studentName, studentRollNo, isChecked } = req.body;
+  console.log(req.body)
+   // Validate that 'id', 'name', and 'rollNo' are present in the request body
+  if (!id || !studentName || !studentRollNo || isChecked === undefined ) {
+  
+    return next(new ErrorHander('Missing required fields (id, studentName, studentRollNo,isChecked', 400));
+
+  }
+
+  // Find the assignment by id
+  const assignment = await Assignment.findById(id);
+
+  if (!assignment) {
+    return next(new ErrorHander('Assignment not found', 404));
+ 
+  }
+
+  // Find the submission in the 'submissions' array based on 'rollNo'
+  const submissionIndex = assignment.submissions.findIndex(
+    (submission) => submission.studentRollNo === studentRollNo
+  );
+
+  if (submissionIndex === -1) {
+
+    return next(new ErrorHander('Submission not found for the given rollNo', 404));
+
+  }
+
+  // Update the submission at the found index
+  assignment.submissions[submissionIndex].isChecked = isChecked;
+
+  // Save the updated assignment
+  await assignment.save();
+ 
+  res.status(200).json({
+    success: true,
+    data: assignment,
+  });
+});
+
 
