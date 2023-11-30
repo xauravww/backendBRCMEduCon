@@ -24,6 +24,10 @@ const submissionSchema = new mongoose.Schema({
     type: String,
     required: true,
     },
+  isChecked: {
+    type: Boolean,
+    default: false,
+    },
 });
 
 const assignmentSchema = new mongoose.Schema({
@@ -44,7 +48,9 @@ const assignmentSchema = new mongoose.Schema({
     {
       type: submissionSchema,
     },
-  ],  teacherName: String,
+  ],  
+  teacherName: String,
+  teacherId: String,
   subject: String,
   status: {
     type: String,
