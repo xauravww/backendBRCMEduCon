@@ -1,7 +1,7 @@
 const app = require("./app");
 const cloudinary = require("cloudinary");
 const connectDatabase = require("./config");
-const { job } = require("./utils/cron");
+const { job } = require("./utils/cron.js");
 job.start()
 
 // Handling Uncaught Exception
