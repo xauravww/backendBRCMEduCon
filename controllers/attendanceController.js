@@ -2,6 +2,7 @@ const Attendance = require("../model/attendnace");
 const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Member = require("../model/login");
+const moment = require("moment");
 
 exports.createAttendance = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -112,7 +113,7 @@ exports.getAllAttendance = catchAsyncErrors(async (req, res, next) => {
 exports.getUniqueAttendance = catchAsyncErrors(async (req, res, next) => {
   const { date, semester, branch } = req.body;
   console.log(req.body)
-  const formattedDate = new Date(date).toISOString();
+  const formattedDate = moment(date).format('YYYY-MM-DD');
   console.log(formattedDate)
 
   // Assuming your Attendance model has fields date, sem, and branch
