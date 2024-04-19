@@ -26,8 +26,8 @@ router.route("/faculty/attendance/students").post(getStudentsForAttendance);
 router
   .route("/faculty/attendance")
   .get(
-    isAuthenticatedUser,
-    authorizeRoles("admin", "faculty"),
+    // isAuthenticatedUser,
+    // authorizeRoles("admin", "faculty"),
     getAllAttendance);
 
 router.route("/faculty/attendance/update").put(
@@ -41,7 +41,7 @@ router
   // isAuthenticatedUser, authorizeRoles("admin","faculty"),
   //  updateAttendance)
   .delete(
-    isAuthenticatedUser, authorizeRoles("admin", "faculty"),
+    // isAuthenticatedUser, authorizeRoles("admin", "faculty"),
     deleteAttendance);
 
 module.exports = router;

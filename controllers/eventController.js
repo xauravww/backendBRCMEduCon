@@ -4,23 +4,11 @@ const ErrorHander = require("../utils/errorhander");
 
 exports.createEvent = catchAsyncErrors(async (req, res, next) => {
     const {
-      title,
-      eventLink,
-      date,
-      lastdate,
-      forSemester,
-      organisedBy,
-      image
+      name,description,date,time,assignTo,eventType,monthCode
     } = req.body;
   
     const newEvent = await Event.create({
-      title,
-      eventLink,
-      date,
-      lastdate,
-      forSemester,
-      organisedBy,
-      image
+      name,description,date,time,assignTo,eventType,monthCode
     });
   
     res.status(201).json({
@@ -47,23 +35,12 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
   exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
     const eventId = req.params.id;
     const {
-      title,
-      eventLink,
-      date,
-      lastdate,
-      forSemester,
-      organisedBy,
-      image
+      name,description,date,time,assignTo,eventType,monthCode
     } = req.body;
   
+  
     const updatedEvent = await Event.findByIdAndUpdate(eventId, {
-      title,
-      eventLink,
-      date,
-      lastdate,
-      forSemester,
-      organisedBy,
-      image
+      name,description,date,time,assignTo,eventType,monthCode
     }, { new: true, runValidators: true });
   
     if (!updatedEvent) {
@@ -84,4 +61,12 @@ exports.getAllEvents = catchAsyncErrors(async (req, res, next) => {
       data: events
     });
   });
-  
+exports.getEventByMonths = catchAsyncErrors(async (req, res, next) => {
+    const id = req.params.id
+    const events = await Event.find({monthCode:id});
+    res.status(200).json({
+      success: true,
+      data: events
+    });
+  });
+

@@ -54,7 +54,11 @@ router.route("/admin/me/update").put(
 
 router
   .route("/admin/members")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), getAllUser);
+  .get(
+    
+    // isAuthenticatedUser, authorizeRoles("admin"),
+  
+  getAllUser);
 
 router
   .route("/admin/members/unverified")
