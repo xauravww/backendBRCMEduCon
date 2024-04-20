@@ -23,7 +23,7 @@ cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+})
 const port=process.env.PORT || 8080
 const server = app.listen(port, () => {
   console.log(`Server is working on http://localhost:${port}`);

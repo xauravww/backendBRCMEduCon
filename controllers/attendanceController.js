@@ -12,14 +12,19 @@ exports.createAttendance = catchAsyncErrors(async (req, res, next) => {
     branch,
     subject
   } = req.body;
-  console.log(req.body);
+ 
   const givenDate = new Date(date);
 
   // Get today's date
-  const today = new Date();
+// Get current date and time in IST
+const today = moment().utcOffset('+05:30').format();
 
+console.log(`today date ${today}`)
+console.log(`given date ${date}`)
+ 
+ 
   // Compare the given date with today's date
-  if (givenDate > today) {
+  if (date.split('T')[0] > today.split('T')[0]) {
     return next(new ErrorHander('Invalid date. Attendance date cannot be greater than today.', 400));
 
   
@@ -79,7 +84,7 @@ exports.updateAttendance = catchAsyncErrors(async (req, res, next) => {
     branch,
     subject
   } = req.body;
-  console.log(req.body);
+ 
 
   const updatedRecord = await Attendance.findByIdAndUpdate(attendanceId, {
     attendanceData,
@@ -112,9 +117,9 @@ exports.getAllAttendance = catchAsyncErrors(async (req, res, next) => {
 // get all attendance
 exports.getUniqueAttendance = catchAsyncErrors(async (req, res, next) => {
   const { date, semester, branch } = req.body;
-  console.log(req.body)
+ 
   const formattedDate = moment(date).format('YYYY-MM-DD');
-  console.log(formattedDate)
+ 
 
   // Assuming your Attendance model has fields date, sem, and branch
   const attendanceRecords = await Attendance.find({
