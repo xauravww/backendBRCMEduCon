@@ -7,14 +7,21 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.body;
 
   if (!token) {
-    return next(new ErrorHander("Please Login to access this resource", 401));
+    return next(new ErrorHander("Please login to access this resource", 401));
   }
 
-  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    req.member = await Member.findById(decodedData.id);
 
-  req.member = await Member.findById(decodedData.id);
+    if (!req.member) {
+      return next(new ErrorHander("User not found", 404));
+    }
 
-  next();
+    next();
+  } catch (error) {
+    return next(new ErrorHander("Invalid token, please login again", 401));
+  }
 });
 
 exports.authorizeRoles = (...roles) => {
@@ -22,7 +29,7 @@ exports.authorizeRoles = (...roles) => {
     if (!roles.includes(req.member.role)) {
       return next(
         new ErrorHander(
-          `Role: ${req.member.role} is not allowed to access this resouce `,
+          `Role: ${req.member.role} is not allowed to access this resource`,
           403
         )
       );
