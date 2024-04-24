@@ -16,32 +16,32 @@ const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const router = express.Router();
 
 router.route("/faculty/attendance").post(
-  // isAuthenticatedUser, authorizeRoles("admin","faculty"),
+  isAuthenticatedUser, authorizeRoles("admin","faculty"),
   createAttendance);
 
 router.route("/faculty/attendance/unique").post(
-  // isAuthenticatedUser, authorizeRoles("admin","faculty"),
+  isAuthenticatedUser, authorizeRoles("admin","faculty"),
   getUniqueAttendance);
 
 
 // get monthly attendance using branch, sem , subject and  roll number
-router.route("/student/attendance").post(getMonthlyStudentAttendance)
+router.route("/student/attendance",isAuthenticatedUser).post(getMonthlyStudentAttendance)
 
 
 // to get students For Attendance of a paticular Branch and Semester
 
-router.route("/faculty/attendance/students").get(getStudentsForAttendance);
+router.route("/faculty/attendance/students",isAuthenticatedUser).get(getStudentsForAttendance);
 
 router
   .route("/faculty/attendance")
   .get(
-    // isAuthenticatedUser,
-    // authorizeRoles("admin", "faculty"),
+    isAuthenticatedUser,
+    authorizeRoles("admin", "faculty"),
     getAllAttendance);
 
 router.route("/faculty/attendance/update").put(
-    // isAuthenticatedUser, 
-    // authorizeRoles("admin","faculty"),
+    isAuthenticatedUser, 
+    authorizeRoles("admin","faculty"),
     updateAttendance);
 
 router
@@ -50,7 +50,7 @@ router
   // isAuthenticatedUser, authorizeRoles("admin","faculty"),
   //  updateAttendance)
   .delete(
-    // isAuthenticatedUser, authorizeRoles("admin", "faculty"),
+    isAuthenticatedUser, authorizeRoles("admin", "faculty"),
     deleteAttendance);
 
 module.exports = router;

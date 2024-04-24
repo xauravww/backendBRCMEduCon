@@ -56,7 +56,8 @@ router
   .route("/admin/members")
   .get(
     
-    // isAuthenticatedUser, authorizeRoles("admin"),
+    isAuthenticatedUser, 
+    authorizeRoles("admin","faculty"),
   
   getAllUser);
 

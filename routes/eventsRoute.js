@@ -9,9 +9,9 @@ const {
   const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 
-router.route("/events1").post(createEvent).get(getAllEvents)
-router.route("/events1/:id").post(getEventByMonths)
-router.route("/events1/delete/:id").delete(deleteEvent)
-router.route("/events1/update/:id").put(updateEvent)
+router.route("/events1",isAuthenticatedUser).post(createEvent).get(getAllEvents)
+router.route("/events1/:id",isAuthenticatedUser).post(getEventByMonths)
+router.route("/events1/delete/:id",isAuthenticatedUser,authorizeRoles("admin")).delete(deleteEvent)
+router.route("/events1/update/:id",isAuthenticatedUser,authorizeRoles("admin")).put(updateEvent)
 
 module.exports =router
