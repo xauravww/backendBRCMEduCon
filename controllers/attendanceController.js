@@ -149,3 +149,43 @@ exports.getStudentsForAttendance = catchAsyncErrors(async (req, res, next) => {
     data: simplifiedStudentList,
   });
 });
+
+exports.getMonthlyStudentAttendance = catchAsyncErrors(async (req, res, next) => {
+  const { month, year, semester, branch, rollno } = req.body;
+
+  if (!month || !year || !semester || !branch || !rollno) {
+    return next(new ErrorHander('Month, year, semester, branch, and roll number are required', 400));
+  }
+
+  const startDate = moment(`${year}-${month}-01`).format('YYYY-MM-DD');
+  const endDate = moment(`${year}-${month}-01`).endOf('month').format('YYYY-MM-DD');
+
+  const attendanceRecords = await Attendance.find({
+    date: { $gte: startDate, $lte: endDate },
+    branch,
+    semester,
+    'attendanceData.rollno': rollno
+  });
+
+  const subjectWiseAttendance = {};
+
+  attendanceRecords.forEach(record => {
+    const attendanceDataForRollNo = record.attendanceData.find(data => data.rollno === rollno);
+    
+    if (attendanceDataForRollNo) {
+      const subject = record.subject;
+      const status = attendanceDataForRollNo.status.toLowerCase();
+      
+      if (!subjectWiseAttendance[subject]) {
+        subjectWiseAttendance[subject] = {};
+      }
+
+      subjectWiseAttendance[subject][moment(record.date).format('YYYY-MM-DD')] = status;
+    }
+  });
+
+  res.status(200).json({
+    success: true,
+    data: subjectWiseAttendance,
+  });
+});
