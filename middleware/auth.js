@@ -4,10 +4,19 @@ const jwt = require("jsonwebtoken");
 const Member = require("../model/login");
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  const { token } = req.body;
+  let token = req.headers.authorization;
+
+  if (!token) {
+    token = req.body.token;
+  }
 
   if (!token) {
     return next(new ErrorHander("Please login to access this resource", 401));
+  }
+
+  // Remove 'Bearer ' from token if it exists in the header
+  if (token.startsWith("Bearer ")) {
+    token = token.split(" ")[1];
   }
 
   try {
