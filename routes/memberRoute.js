@@ -26,9 +26,9 @@ router.route("/register").post(singleUpload, registerMember);
 router.route("/login").post(loginMember);
 // router.route("/sample").post(singleUpload, sample);
 
-// router.route("/password/forgot").post(forgotPassword);
+router.route("/password/forgot").post(forgotPassword);
 
-// router.route("/password/reset/:token").put(resetPassword);
+router.route("/password/reset").put(resetPassword);
 
 // router.route("/logout").get(logout);
 
@@ -50,6 +50,7 @@ router.route("/admin/verify").put(
 
 router.route("/admin/me/update").put(
   isAuthenticatedUser,
+  singleUpload,
   updateProfile);
 
 router
