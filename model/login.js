@@ -78,7 +78,7 @@ const loginSchema = new mongoose.Schema({
   },  
   
   dateOfBirth: {
-    type: Date,
+    type: String,
     default: null
   },      
   
@@ -96,8 +96,29 @@ const loginSchema = new mongoose.Schema({
   },
   branch: {
     type: String,
-    enum: ["Cse", "Mechanical", "Electrical","Civil","Branch"],
-    default: "Branch"
+    enum: ["CSE", "ME", "EE","CIVIL",""],
+  },
+  randomPass: {
+    type: String,
+    default: null // or any default value you prefer
+  },
+  resetPasswordExpire: {
+    type: Date,
+    default: Date.now // or any default value you prefer
+  },
+  professionalExperience: [
+    {
+      jobTitle: String,
+      company: String,
+      duration: String,
+      responsibilities: [String],
+      achievements: [String],
+    },
+  ],
+  contactInformation: {
+    linkedInProfile: String,
+    personalWebsite: String,
+    professionalEmail: String,
   },
 });
 
@@ -132,10 +153,29 @@ loginSchema.methods.getResetPasswordToken = function () {
     .update(resetToken)
     .digest("hex");
 
-  this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+  this.resetPasswordExpire = Date.now();
 
   return resetToken;
 };
+
+loginSchema.methods.generateRandomPassword = function () {
+  // Generating a random password
+  const randomPassword = Math.random().toString(36).slice(-8); // Generates an 8-character random password
+
+  // Setting the random password to the user's password field
+  this.randomPass = randomPassword;
+
+  // Set expiration time to 15 minutes from now
+  const expirationTime = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes in milliseconds
+
+  // Setting the expiration time to the schema
+  this.resetPasswordExpire = expirationTime;
+
+  // Hashing the password using bcrypt before saving
+  return randomPassword;
+};
+
+
 
 module.exports = mongoose.model("Member", loginSchema);
 /* sample data

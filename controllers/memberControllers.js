@@ -6,7 +6,7 @@ const sendEmail = require("../utils/sendEmail");
 const getDataUri = require("../utils/dataUri.js");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
-
+const bcrypt = require("bcryptjs");
 
 exports.sample = catchAsyncErrors(async (req, res, next) => {
 
@@ -159,30 +159,32 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Get ResetPassword Token
-  const resetToken = user.getResetPasswordToken();
+  const randomPassword = await user.generateRandomPassword();
 
-  await user.save({ validateBeforeSave: false });
+  const data = await user.save({ validateBeforeSave: false });
+console.log("saved data : ",data)
+  // const resetPasswordUrl = `${req.protocol}://${req.get(
+  //   "host"
+  // )}/api/v1/password/reset/${resetToken}`;
 
-  const resetPasswordUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/password/reset/${resetToken}`;
-
-  const message = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it.`;
-
+  const message = `Your  reset  password  is :- \n\n ${randomPassword} \n\nIf you have not requested this email then, please ignore it.`;
+console.log("message :",message)
   try {
-    await sendEmail({
-      email: user.email,
+    const result  = await sendEmail({
+      email: req.body.email,
       subject: `BRCM Password Recovery`,
       message,
     });
 
     res.status(200).json({
       success: true,
-      message: `Email sent to ${user.email} successfully`,
+      message: `Email sent to ${req.body.email} successfully`,
+      result:result
     });
   } catch (error) {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
+    // user.resetPasswordToken = undefined;
+    // user.resetPasswordExpire = undefined;
+    user.randomPass = null
 
     await user.save({ validateBeforeSave: false });
 
@@ -190,40 +192,57 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-// Reset Password
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
-  // creating token hash
-  const resetPasswordToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
+  try {
+    // Retrieve the reset token from the URL parameter
+    const resetPass = req.params.token;
+    console.log("Random password token from user :", resetPass);
 
-  const user = await Member.findOne({
-    resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() },
-  });
+    // Find the user with the matching reset token
+    const user = await Member.findOne({ email:req.body.email });
 
-  if (!user) {
-    return next(
-      new ErrorHander(
-        "Reset Password Token is invalid or has been expired",
-        400
-      )
-    );
+    // If no user is found or the token is invalid, return an error
+    if (!user) {
+      return next(new ErrorHander("User not found or invalid token", 400));
+    }
+
+    // Check if the password reset token has expired
+    if (user.resetPasswordExpire && user.resetPasswordExpire < Date.now()) {
+      return next(new ErrorHander("Password reset token has expired", 400));
+    }
+
+    // Ensure that the new password matches the confirmed password
+    if (req.body.password !== req.body.confirmPassword) {
+      return next(new ErrorHander("Passwords do not match", 400));
+    }
+
+    // Check if the randomPass from database and from body are the same
+    if (user.randomPass !== req.body.randomPass) {
+      return next(new ErrorHander("Invalid random password", 400));
+    }
+
+    // Update user's password field
+    user.pass = req.body.password; // this password automatically hashed using pre at login schema before saving
+
+    // Clear the reset token and expiration fields
+    // user.resetPasswordToken = undefined;
+    // user.resetPasswordExpire = undefined;
+    user.randomPass = null;
+    user.resetPasswordExpire=null
+    // Save the updated user data
+    await user.save({validateBeforeSave:false});
+
+    // Send a response with a new JWT token
+    sendToken(user, 200, res);
+  } catch (error) {
+    next(error);
   }
-
-  if (req.body.password !== req.body.confirmPassword) {
-    return next(new ErrorHander("Password does not password", 400));
-  }
-
-  user.password = req.body.password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
-
-  await user.save();
-
-  sendToken(user, 200, res);
 });
+
+
+
+
+
 
 // Get User Detail
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
@@ -257,52 +276,69 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 // update User Profile
+// update User Profile
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+  // Extract updated member data from the request body
+  const {
+    _id, // Add the _id field from req.body
+    email, phone, countryCode, pass, role,
+    rollno, name, semester, address,
+    batchYear, branch, fathername,
+    registrationNo, dateOfBirth, age
+  } = req.body;
+
   const newUserData = {
-    email: req.body.email,
-    phone: req.body.phone,
-    countryCode: req.body.countryCode,
-    pass: req.body.pass,
-    role: req.body.role,
-    rollno: req.body.rollno,
-    name: req.body.name,
-    semester: req.body.semester,
-    imageurl: req.body.imageurl,
-    address: req.body.address,
-    batchYear: req.body.batchYear,
-    fathername: req.body.fathername,
-    registrationNo: req.body.registrationNo,
-    dateOfBirth: req.body.dateOfBirth,
-    age: req.body.age,
+    email, phone, countryCode, role,
+    rollno, name, semester,
+    address, batchYear, branch,
+    fathername, registrationNo, dateOfBirth, age
   };
 
-  // if (req.body.avatar !== "") {
-  //   const user = await Member.findById(req.user.id);
+  // Check if a new password is provided
+  if (pass) {
+    // Hash the new password
+    const hashedPass = await bcrypt.hash(pass, 10);
+    newUserData.pass = hashedPass;
+  }
 
-  // const imageId = user.avatar.public_id;
+  // Check if there is a file in the request for updating the image
+  if (req.file) {
+    // Upload the new image to cloudinary
+    const fileUri = getDataUri(req.file);
+    const newCloudImage = await cloudinary.v2.uploader.upload(fileUri.content);
+    newUserData.imageurl = {
+      public_id: newCloudImage.public_id,
+      url: newCloudImage.secure_url,
+    };
 
-  // await cloudinary.v2.uploader.destroy(imageId);
+    // Delete the old image if it exists
+    const member = await Member.findById(_id);
+    if (member && member.imageurl && member.imageurl.url) { // Check if member exists and has imageurl
+      const publicId = member.imageurl.public_id;
+      await cloudinary.v2.uploader.destroy(publicId);
+    }
+  } else {
+    // Keep the old image if no new file is received
+    const member = await Member.findById(_id);
+    if (member && member.imageurl && member.imageurl.url) { // Check if member exists and has imageurl
+      newUserData.imageurl = {
+        public_id: member.imageurl.public_id,
+        url: member.imageurl.url,
+      };
+    }
+  }
 
-  // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-  //   folder: "avatars",
-  //   width: 150,
-  //   crop: "scale",
-  // });
-
-  //   newUserData.avatar = {
-  //     public_id: myCloud.public_id,
-  //     url: myCloud.secure_url,
-  //   };
-  // }
-
-  const member = await Member.findByIdAndUpdate("652637158cc7e023bc6baff3", newUserData, {
+  // Update the member with the new data
+  const updatedMember = await Member.findByIdAndUpdate(_id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
 
+  // Send success response
   res.status(200).json({
     success: true,
+    data: updatedMember,
   });
 });
 
@@ -362,11 +398,11 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  const imageId = user.avatar.public_id;
+  const imageId = user.imageurl.public_id;
 
   await cloudinary.v2.uploader.destroy(imageId);
 
-  await user.remove();
+  await user.deleteOne();
 
   res.status(200).json({
     success: true,
