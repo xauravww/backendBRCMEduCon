@@ -1,80 +1,123 @@
-const TimeTable = require('../model/timeTable');
 const ErrorHander = require("../utils/errorhander");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const Timetable = require('../model/timeTable'); // Updated import statement
 
-// Create a TimeTable
-exports.createTimeTable = catchAsyncErrors(async (req, res, next) => {
+// Create an event in the timetable
+exports.addEvent = catchAsyncErrors(async (req, res, next) => {
     const {
-        teacherID,
-        teacherName,
-        day,
-        classCoordinator,
-        subjects
+        id,
+        title,
+        start,
+        end,
+        color,
+        sem,
+        branch,
+        facultyId,
+        facultyName,
+        subject
     } = req.body;
 
-    const newTimeTable = await TimeTable.create({
-        teacherID,
-        teacherName,
-        day,
-        classCoordinator,
-        subjects
-    });
+    try {
+        // Check if there's already an event with the same subject and overlapping start or end dates
+        const existingEvent = await Timetable.findOne({
+            subject: subject,branch:branch,
+            $or: [
+                { start: { $lte: start }, end: { $gte: start } }, // Check for overlap with start date
+                { start: { $lte: end }, end: { $gte: end } },     // Check for overlap with end date
+                { start: { $gte: start }, end: { $lte: end } }    // Check for containment within existing event
+            ]
+        });
 
-    res.status(201).json({
-        success: true,
-        data: newTimeTable
-    });
+        if (existingEvent) {
+            return next(new ErrorHander('Duplicate event: There is already an event for the same subject with overlapping dates.', 400));
+        }
+
+        const event = {
+            id,
+            title,
+            start,
+            end,
+            color,
+            sem,
+            branch,
+           facultyName,facultyId,
+            subject
+        };
+
+        const createdEvent = await Timetable.create(event);
+
+        res.status(201).json({
+            success: true,
+            data: createdEvent
+        });
+    } catch (error) {
+        return next(new ErrorHander(error.message, 400));
+    }
 });
 
-// Get all TimeTables
-exports.getAllTimeTables = catchAsyncErrors(async (req, res, next) => {
-    const timeTables = await TimeTable.find();
-    res.status(200).json({
-        success: true,
-        data: timeTables
-    });
-});
 
-// Get a single TimeTable by Teacher ID
-exports.getTimeTableByTeacherId = catchAsyncErrors(async (req, res, next) => {
-    const teacherID = req.params.teacherID;
+// Delete an event from the timetable
+exports.deleteEvent = catchAsyncErrors(async (req, res, next) => {
+    const timetable = await Timetable.findOneAndDelete(
+        { _id: req.params.eventId },
+       
+    );
 
-    const timeTable = await TimeTable.findOne({ teacherID });
-
-    if (!timeTable) {
-        return next(new ErrorHander(`TimeTable not found for teacher with ID: ${teacherID}`, 404));
+    if (!timetable) {
+        return next(new ErrorHander('Timetable not found', 404));
     }
 
     res.status(200).json({
         success: true,
-        data: timeTable
+        data: timetable
+    });
+});
+exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
+    const eventId = req.params.eventId; // Destructure event ID
+    const updatedEvent = req.body;
+  
+    try {
+      const updatedEventDocument = await Event.findByIdAndUpdate(
+        eventId, // Find the event by ID
+        updatedEvent, // Update the entire event document with new data
+      );
+  
+      if (!updatedEventDocument) {
+        return next(new ErrorHander('Event not found', 404));
+      }
+  
+      res.status(200).json({
+        success: true,
+        data: updatedEventDocument
+      });
+    } catch (error) {
+      return next(new ErrorHander(error.message, 400));
+    }
+  });
+  
+
+
+// Get events by faculty ID
+exports.getEventsByFacultyId = catchAsyncErrors(async (req, res, next) => {
+    const facultyId = req.params.facultyId;
+
+    const timetables = await Timetable.find({facultyId });
+
+    res.status(200).json({
+        success: true,
+        data: timetables
     });
 });
 
+// Get events by branch and semester
+exports.getEventsByBranchAndSemester = catchAsyncErrors(async (req, res, next) => {
+    const branch = req.params.branch;
+    const semester = req.params.semester;
 
-// Update a TimeTable
-exports.updateTimeTable = catchAsyncErrors(async (req, res, next) => {
-    const updatedTimeTable = await TimeTable.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true
-    });
-    if (!updatedTimeTable) {
-        return next(new ErrorHander('TimeTable not found', 404));
-    }
+    const timetables = await Timetable.find({ "branch": branch, "sem": semester });
+
     res.status(200).json({
         success: true,
-        data: updatedTimeTable
-    });
-});
-
-// Delete a TimeTable
-exports.deleteTimeTable = catchAsyncErrors(async (req, res, next) => {
-    const deletedTimeTable = await TimeTable.findByIdAndDelete(req.params.id);
-    if (!deletedTimeTable) {
-        return next(new ErrorHander('TimeTable not found', 404));
-    }
-    res.status(200).json({
-        success: true,
-        data: deletedTimeTable
+        data: timetables
     });
 });
