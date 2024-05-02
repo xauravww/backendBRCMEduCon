@@ -1,37 +1,52 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const timeTableSchema = new mongoose.Schema({
-  teacherID: {
-    type: String,
-    required: true
+// Schema for individual events in the timetable
+const eventSchema = new mongoose.Schema({
+    id:{
+        type: String,
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    start: {
+        type: Date,
+        required: true
+    },
+    end: {
+        type: Date,
+        required: true
+    },
+    color: {
+        type: String,
+    },
+    sem: {
+        type: String,
+        required: true
+    },
+    branch: {
+        type: String,
+        required: true
+    },
+    facultyId: {
+      type: String,
   },
-  teacherName: {
-    type: String,
-    required: true
+  facultyName: {
+      type: String,
   },
-  day: {
-    type: String,
-    required: true
-  },
-  classCoordinator: {
-    type: String,
-    required: true
-  },
-  subjects: [
-    {
-      subjectName: String,
-      isFree: Boolean,
-      isPresent: Boolean,
-      semester: String,
-      period: String,
-      startTime: String,
-      endTime: String,
-      roomNo: String
+    subject:{
+        type: String,
     }
-  ]
 });
 
-module.exports = mongoose.model("TimeTable", timeTableSchema);
+// Pre-save hook to set the id field to the _id value
+eventSchema.pre('save', function(next) {
+    if (!this.id) {
+        this.id = this._id.toString();
+    }
+    next();
+});
 
+const Timetable = mongoose.model('Timetable', eventSchema);
 
-
+module.exports = Timetable;
