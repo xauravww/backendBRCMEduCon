@@ -344,7 +344,7 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
 
 // Get all users(admin)
 exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
-  const users = await Member.find().select('+pass');
+  const users = await Member.find();
 
   res.status(200).json({
     success: true,
