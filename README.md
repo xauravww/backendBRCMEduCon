@@ -55,10 +55,11 @@ RENDER_BACKEND_URL=<url> # For cron job
 
 ## 1. Authentication (`memberRoute.js`)
 
-### Register Member
+### Register/Update Member
 
 ```bash
 POST /api/v1/register
+PUT /api/v1/admin/me/update
 Content-Type: multipart/form-data
 ```
 
@@ -83,8 +84,11 @@ Content-Type: multipart/form-data
 
 If you're testing with Postman send these above fields in `form-data` , in case of `file` field change its type from `text type` to `file type` by clicking on dropdown while entering value.
 
+In case of update endpoint `/admin/me/update/` all above fields are optional.
+Only send the fields which we want to change.
+
 <details>
-  <summary>Sample Response (Click to Toggle)</summary>
+  <summary>Sample Response Register (Click to Toggle)</summary>
 
   ```json
   {
@@ -119,6 +123,17 @@ If you're testing with Postman send these above fields in `form-data` , in case 
       },
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzEzY2U5ZjY2MWEzOTBlNzBhMGRlNCIsImlhdCI6MTczNTQ3NDQwOSwiZXhwIjoxNzQ4NDM0NDA5fQ.DHkQGyZc90CyQyA0Wp5ohzZskYewpGqDl2ND7e8r6v8"
   }
+```
+</details>
+
+<details>
+    <summary>Sample Response Update Member (Click to toggle)</summary>
+
+```json
+{
+    "success": true,
+    "data": null
+}
 ```
 </details>
 
@@ -274,6 +289,401 @@ In reset password endpoint `PUT` this:
 ```
 </details>
 
+### Fetch All Members
+```bash
+GET /api/v1/admin/members
+```
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+Only user which has role of `admin` or `faculty` is allowed to get all of the user.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+<details>
+    <summary>Dummy Response Fetch All Members (click to toggle)</summary>
+        
+```json
+{
+    "success": true,
+    "users":[
+    // multiple members objects
+    ]
+}
+```
+</details>
+
+## 2. Attendance System (routes/attendanceRoute.js)
+
+## Get All Attendance
+
+```bash
+GET /api/v1/faculty/attendance
+POST /api/v1/faculty/attendance
+```
+`GET` method returns all the attendaces.
+`POST` method used to create the attendance
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+Only user which has role of `admin` or `faculty` is allowed to get all of the attendances.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+#### Fields for Adding New Attendance Data
+
+- **attendanceData** `@type(array)`  
+  An array of objects with the following fields:
+  - **memberId** `@type(MongoDB ObjectId)`  
+  - **name** `@type(string)`
+  - **rollno** `@type(string)`
+  - **status** `@type(string)` `@enum("Present", "Absent", "Late", "None")`  
+  - **remarks** `@type(string)` `@enum("on_time", "late", "leave", "none")`
+
+- **date** `@type(string)`
+- **branch** `@type(string)`
+- **semester** `@type(string)`
+- **subject** `@type(string)`
+
+<details>
+<summary>Sample Request Data To Create Attendance (Click to toggle) </summary>
+
+```json
+{
+  "attendanceData": [
+    {
+      "memberId": "65617c51b8a0ecc0d21e65cb",
+      "name": "Ashish",
+      "rollno": "20-CSE-105",
+      "status": "Absent",
+      "remarks": "none"
+    }
+  ],
+  "date": "2024-12-29",
+  "branch": "CSE",
+  "semester": "Sem1",
+  "subject": "Mathematics"
+}
+```
+
+</details>
+
+<details>
+<summary>Sample Response Data after Creating Attendance (Click to toggle)</summary>
+
+```json
+{
+    "success": true,
+    "data": {
+        "attendanceData": [
+            {
+                "memberId": "65617c51b8a0ecc0d21e65cb",
+                "name": "Ashish",
+                "rollno": "20-CSE-105",
+                "status": "Absent",
+                "remarks": "none",
+                "_id": "67717371d4b78f8e6692b90f"
+            }
+        ],
+        "date": "2024-12-29",
+        "branch": "CSE",
+        "semester": "Sem1",
+        "subject": "Mathematics",
+        "_id": "67717371d4b78f8e6692b90e",
+        "__v": 0
+    }
+}
+```
+</details>
+
+### Get List Of Students of selected branch and semester for attendace
+
+```bash
+GET /api/v1/faculty/attendance/students
+```
+
+```bash
+POST /api/v1/student/attendance
+```
+
+#### Fields:
+
+- **branch** `@type(string)`
+- **semester** `@type(string)`
+
+However, in this endpoint , all fields are not required but provide both fields to get proper list of students.
+
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body. All roles are authorized.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+### Get Monthly Attendance
+
+```bash
+POST /student/attendance
+```
+Usecase: When we want to show attendance of their own account in their dashboard of the user which is logged in only , not other students attendace.
+
+### Fields
+
+- **month** `@type(string) @required`
+- **year** `@type(string) @required`
+- **semester** `@type(string) @required`
+- **branch** `@type(string) @required`
+- **rollno** `@type(string) @required`
+
+<details>
+<summary>Sample Request Data to Get Attendance (Click to toggle)</summary>
+
+```json
+{
+  "month": "December",
+  "year": "2024",
+  "semester": "Sem1",
+  "branch": "CSE",
+  "rollno": "20-CSE-105"
+}
+```
+</details>
+<details>
+<summary>Sample Response Data After Getting Attendance (Click to toggle)</summary>
+
+```json
+{
+    "success": true,
+    "data": {
+        "Mathematics": {
+            "2024-12-29": "absent"
+        }
+    }
+}
+```
+
+</details>
+
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body. All roles are authorized.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+### Updating the Attendance
+
+```bash
+PUT /api/v1/faculty/attendance/update
+```
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+Only user which has role of `admin` or `faculty` is allowed to update all of the attendances.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+### Fields
+
+- **attendanceData** `@type(array)`  
+  An array of objects with the following fields:
+  - **memberId** `@type(MongoDB ObjectId)`  
+  - **name** `@type(string)`
+  - **rollno** `@type(string)`
+  - **status** `@type(string)` `@enum("Present", "Absent", "Late", "None")`  
+  - **remarks** `@type(string)` `@enum("on_time", "late", "leave", "none")`
+
+- **date** `@type(string)`
+- **branch** `@type(string)`
+- **semester** `@type(string)`
+- **subject** `@type(string)`
+- **id** `@type(MongoDb ObjectId of any object in attendaces collection)`
+
+However `id` is not required field but you will not get any attendaces to updates without this `id`, so provide a `id` always.
+
+<details>
+<summary>Sample Request Data To Update Attendance (Click to toggle) </summary>
+
+```json
+{
+  "attendanceData": [
+    {
+      "memberId": "65617c51b8a0ecc0d21e65cb",
+      "name": "Ashish",
+      "rollno": "20-CSE-105",
+      "status": "Absent",
+      "remarks": "none"
+    }
+  ],
+  "date": "2024-12-29",
+  "branch": "CSE",
+  "semester": "Sem1",
+  "subject": "Mathematics",
+  "id":"67717371d4b78f8e6692b90e"
+}
+```
+
+</details>
+<details>
+<summary>Sample Response Data After Updating Attendance (Click to toggle) </summary>
+
+```json
+{
+    "success": true,
+    "data": {
+        "_id": "67717371d4b78f8e6692b90e",
+        "attendanceData": [
+            {
+                "memberId": "65617c51b8a0ecc0d21e65cb",
+                "name": "Ashish",
+                "rollno": "20-CSE-105",
+                "status": "Absent",
+                "remarks": "none",
+                "_id": "6771840cd4b78f8e6692b93c"
+            }
+        ],
+        "date": "2024-12-29",
+        "branch": "CSE",
+        "semester": "Sem1",
+        "subject": "Mathematics",
+        "__v": 0
+    }
+}
+```
+
+</details>
+
+### Delete the attendace
+```bash
+DELETE /api/v1/faculty/attendance/:id
+```
+Sample Usage:
+```bash
+DELETE /api/v1/faculty/attendance/67717371d4b78f8e6692b90e
+```
+
+Here `id` is of `@type(MongoDb ObjectId of any object in attendaces collection)`
+
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+Only user which has role of `admin` or `faculty` is allowed to delete the attendance.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+<details>
+<summary>Sample Request Data To Update Attendance (Click to toggle) </summary>
+
+```json
+{
+  "attendanceData": [
+    {
+      "memberId": "65617c51b8a0ecc0d21e65cb",
+      "name": "Ashish",
+      "rollno": "20-CSE-105",
+      "status": "Absent",
+      "remarks": "none"
+    }
+  ],
+  "date": "2024-12-29",
+  "branch": "CSE",
+  "semester": "Sem1",
+  "subject": "Mathematics",
+  "id":"67717371d4b78f8e6692b90e"
+}
+```
+
+</details>
+<details>
+<summary>Sample Response Data After Deleting Attendance (Click to toggle) </summary>
+
+```json
+{
+    "success": true,
+    "data": {
+        "_id": "67717371d4b78f8e6692b90e",
+        "attendanceData": [
+            {
+                "memberId": "65617c51b8a0ecc0d21e65cb",
+                "name": "Ashish",
+                "rollno": "20-CSE-105",
+                "status": "Absent",
+                "remarks": "none",
+                "_id": "6771840cd4b78f8e6692b93c"
+            }
+        ],
+        "date": "2024-12-29",
+        "branch": "CSE",
+        "semester": "Sem1",
+        "subject": "Mathematics",
+        "__v": 0
+    }
+}
+```
+
+</details>
+
+### Get Unique Attendances
+
+```bash
+GET /api/v1/faculty/attendance/unique
+
+```
+Usecase: When faculty wants to retrieve attendances of a paticular branch , subject on a particular date. We don't need to fetch all the attedances which we don't want.
+
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+Only user which has role of `admin` or `faculty` is allowed to get the unique attendance.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+### Fields
+
+- **date** `@type(string)`
+- **semester** `@type(string)`
+- **branch** `@type(string)`
+
+<details>
+<summary>Sample Request Data To Get Unique Attendance (Click to toggle) </summary>
+
+```json
+{
+    "semester":"Sem8",
+    "branch":"CSE",
+    "date":"2024-04-21"
+}
+```
+
+</details>
+<details>
+<summary>Sample Response Data After Finding Unique Attendance (Click to toggle) </summary>
+
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "_id": "6624e404e480671988c7dfa0",
+            "attendanceData": [
+                {
+                    "memberId": "655f2c391f2bc0fbf57585ed",
+                    "name": "Anmol",
+                    "rollno": "20-CSE-4348",
+                    "status": "Present",
+                    "remarks": "none",
+                    "_id": "6624e414e480671988c7dfb0"
+                },
+                {
+                    "memberId": "655ecb5a3d20240ea6884232",
+                    "name": "Hans Kumar",
+                    "rollno": "20-CSE-4358",
+                    "status": "Present",
+                    "remarks": "none",
+                    "_id": "6624e414e480671988c7dfb1"
+                }
+            ],
+            "date": "2024-04-21",
+            "branch": "CSE",
+            "semester": "Sem8",
+            "subject": "PROJECT-III",
+            "__v": 0
+        }
+    ]
+}
+```
+
+</details>
 
 
 
