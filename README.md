@@ -491,7 +491,7 @@ Note: For testing in postman you can directly set the auth token in Authorizatio
 - **subject** `@type(string)`
 - **id** `@type(MongoDb ObjectId of any object in attendaces collection)`
 
-However `id` is not required field but you will not get any attendaces to updates without this `id`, so provide a `id` always.
+However `id` is not required field but you will not get any attendaces to updates without this `id`, so provide an `id` always.
 
 <details>
 <summary>Sample Request Data To Update Attendance (Click to toggle) </summary>
@@ -685,6 +685,136 @@ Note: For testing in postman you can directly set the auth token in Authorizatio
 
 </details>
 
+
+## 3. Events Management (routes/eventsRoute.js)
+
+### Create Event , Update Event or Get All Events
+```bash
+POST /api/v1/events1
+GET /api/v1/events1
+PUT /api/v1/events1/update/:id
+DELETE /api/v1/events1/delete/:id
+```
+No need to send any of this fields in case of getting all events.
+
+
+Update events usage example:
+```bash
+PUT /api/v1/events1/update/677191a6d4b78f8e6692b952
+```
+DELETE events usage example:
+```bash
+DELETE /api/v1/events1/delete/677191a6d4b78f8e6692b952
+```
+In case of update all fields are optional. You must need to pass id of event in request parameters.
+But for creating a new event you are already given which field are required and which are optional.
+
+### Fields
+
+- **name**: `@type(string) @required`
+- **description**: `@type(string)`
+- **date**: `@type(string) @required`
+- **time**: `@type(string)`
+- **assignTo**: `@type(string) @required` ->  "Student" || "Faculty" || "All" 
+- **eventType**: `@type(string) @required` -> "Holiday" || "Event"
+- **monthCode**: `@type(number) @required`
+
+```json
+{
+  "name": "New Year Celebration",
+  "description": "A celebration to welcome the new year with all students and faculty.",
+  "date": "2025-01-01",
+  "time": "00:00 AM",
+  "assignTo": "All",
+  "eventType": "Holiday",
+  "monthCode": 1
+}
+```
+<details>
+    <summary>Sample request data to create/update an event(click to toggle )</summary>
+```json
+{
+    "success": true,
+    "data": {
+        "name": "New Year Celebration",
+        "description": "A celebration to welcome the new year with all students and faculty.",
+        "date": "2025-01-01",
+        "time": "00:00 AM",
+        "assignTo": "All",
+        "eventType": "Holiday",
+        "monthCode": 1,
+        "_id": "677191a6d4b78f8e6692b952",
+        "__v": 0
+    }
+}
+```
+</details>
+<details>
+    <summary>Sample Response after creating/deleting/updating an item or getting all the events (click to toggle)</summary>
+
+```json
+{
+    "success": true,
+    "data": {
+        "_id": "677191a6d4b78f8e6692b952",
+        "name": "New Year Celebration",
+        "description": "A celebration to welcome the new year with all students and faculty.",
+        "date": "2025-01-01",
+        "time": "00:00 AM",
+        "assignTo": "Student",
+        "eventType": "Holiday",
+        "monthCode": 1,
+        "__v": 0
+    }
+}
+//In case of getting all the events the data will be an array of multiple event data objects.
+```
+</details>
+
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+Only user which has role of `admin` is allowed to delete/update the event.
+To get all event and to create an event there is no authorization required.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+
+### Get Event By Month Code
+
+```bash
+PUT /api/v1/events1/:id
+```
+Sample Usage:
+```bash
+PUT /api/v1/events/1
+```
+<details>
+    <summary>Response after getting event by month code (click to toggle)</summary>
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "_id": "677191a6d4b78f8e6692b952",
+            "name": "New Year Celebration",
+            "description": "A celebration to welcome the new year with all students and faculty.",
+            "date": "2025-01-01",
+            "time": "00:00 AM",
+            "assignTo": "All",
+            "eventType": "Holiday",
+            "monthCode": 1,
+            "__v": 0
+        }
+    ]
+}
+```
+</details>
+
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+All roles are authorized.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
 
 
 ## Authentication & Authorization
