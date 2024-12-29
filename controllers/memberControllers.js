@@ -10,7 +10,7 @@ const bcrypt = require("bcryptjs");
 
 exports.sample = catchAsyncErrors(async (req, res, next) => {
 
-  console.log(req);
+  // console.log(req);
 
   // if (!req.files.photo) {
   //   return res.status(400).json({ error: 'No file uploaded' });
@@ -49,7 +49,7 @@ exports.sample = catchAsyncErrors(async (req, res, next) => {
 
 exports.registerMember = catchAsyncErrors(async (req, res, next) => {
   const file = req.file;
-  console.log(req)
+  console.log(file)
   const fileUri = getDataUri(file);
 
 
@@ -61,7 +61,11 @@ exports.registerMember = catchAsyncErrors(async (req, res, next) => {
     address, batchYear, branch,
     fathername, registrationNo, dateOfBirth, age } = req.body;
   // creating member 
-  console.log(req.body.email);
+
+  console.log( email, phone, countryCode, pass, role,
+    createdAt, rollno, name, semester,
+    address, batchYear, branch,
+    fathername, registrationNo, dateOfBirth, age);
 
   const member = await Member.create({
 
@@ -126,7 +130,7 @@ exports.getAllUnverifiedMembers = catchAsyncErrors(async (req, res, next) => {
 // Login Member
 exports.loginMember = catchAsyncErrors(async (req, res, next) => {
   const { email, pass } = req.body;
-  console.log(req)
+  // console.log(req)
   // checking if member has given password and email both
 
   if (!email || !pass) {
@@ -195,7 +199,7 @@ console.log("message :",message)
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   try {
     // Retrieve the reset token from the URL parameter
-    const resetPass = req.params.token;
+    const resetPass = req.body.randomPass;
     console.log("Random password token from user :", resetPass);
 
     // Find the user with the matching reset token

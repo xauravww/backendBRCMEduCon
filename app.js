@@ -17,7 +17,7 @@ const attendance = require("./routes/attendanceRoute");
 const status = require("./routes/collegeStatusRoute");
 const gallery = require("./routes/galleryRoute");
 
-const idCrad = require("./routes/idCardRoute");
+const idCard = require("./routes/idCardRoute");
 const assignment = require("./routes/assignmentRoute");
 const timeTable = require("./routes/timeTableRoute");
 const events = require("./routes/eventsRoute")
@@ -28,7 +28,7 @@ app.use("/api/v1", member);
 app.use("/api/v1", attendance);
 app.use("/api/v1", status);
 app.use("/api/v1", assignment);
-app.use("/api/v1", idCrad);
+app.use("/api/v1", idCard);
 
 app.use("/api/v1", gallery);
 app.use("/api/v1", timeTable);

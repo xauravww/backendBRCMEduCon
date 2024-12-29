@@ -1,457 +1,320 @@
-# BRCM API Documentation
+# BRCM EduCon Backend API Documentation
 
-# Project Overview
+## Overview
 
-This README provides an overview of the BRCMApi, including API endpoints and guidelines.
+Backend API service for BRCM Educational Platform providing comprehensive endpoints for:
 
-# Prerequisites
+- User Authentication & Management
+- Attendance Tracking
+- Assignment Management  
+- Events & Gallery Management
+- TimeTable Management
+- College Status & ID Card Management
 
-List any prerequisites required to set up and run the backend. This may include software, hardware, or other dependencies.
+## Prerequisites
 
-# Installation
+- Node.js
+- MongoDB
+- Cloudinary Account (for image/file storage)
+- SMTP Service (for email notifications)
 
-```terminal
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo
+## Installation
+
+```bash
+git clone <repository-url>
+cd backendBRCMEduCon
 npm install
 ```
 
 # Configuration
 
-Explain how to configure your project. This may include setting environment variables, modifying configuration files, or connecting to external services.
+Create a config.env file with:
 
-# Usage 
-Describe how to use your backend. Provide code examples or sample requests to your API. Explain different use cases and scenarios
+```env
+NODE_ENV=DEVELOPMENT
+PORT=4000
+MONGODB_URL=<mongodb-url>
+JWT_SECRET=<jwt-secret>
+JWT_EXPIRE=<expiry-time> # e.g. "150d"
+COOKIE_EXPIRE = "12"
 
-# API Documentation
+CLOUDINARY_NAME=<name>
+CLOUDINARY_API_KEY=<key>
+CLOUDINARY_API_SECRET=<secret>
 
-If your backend exposes APIs, document them in detail. Use a tool like Swagger or provide a clear description of the available endpoints, request methods, request/response format, and example requests. Include authentication requirements if applicable.
+SMTP_HOST=<smtp-host>
+SMTP_PORT=<smtp-port>
+SMTP_SERVICE=<service-name>
+SMTP_MAIL=<email>
+SMTP_PASSWORD=<password>
+
+RENDER_BACKEND_URL=<url> # For cron job
+```
+
+# Core Features
+
+## 1. Authentication (`memberRoute.js`)
+
+### Register Member
+
+```bash
+POST /api/v1/register
+Content-Type: multipart/form-data
+```
+
+### Fields Defined in `model/login.js`
+
+- **email** `@type(string) @unique @required` -> `"xavier@example.com"`
+- **phone** `@type(number)` -> `"1234567890"`
+- **countryCode** `@type(number)` -> `91`
+- **pass** `@type(string) @required @minLength(8)` -> `"1234567890"`
+- **role** `@type(string)` -> `"student" | "faculty" | "admin"`
+- **address** `@type(string)` -> `"address street"`
+- **name** `@type(string)` -> `"Xavier"`
+- **rollno** `@type(string)` -> `"20-CSE-1234"`
+- **fathername** `@type(string)` -> `"Beluga"`
+- **registrationNo** `@type(string)` -> `"12112414142"`
+- **dateOfBirth** `@type(string)` -> `"2002-10-10T00:00:00.000Z"`
+- **age** `@type(string)` -> `22`
+- **file** `@type(file)` -> `{ public_id: "xyz123", url: "https://example.com/image.jpg" }`
+- **semester** `@type(string)` -> `"Sem1" | "Sem2" | ... | "Sem8"`
+- **branch** `@type(string)` -> `"CSE" | "ME" | "EE" | "CIVIL"`
+- **batchYear** `@type(number)` -> `2020`
+
+If you're testing with Postman send these above fields in `form-data` , in case of `file` field change its type from `text type` to `file type` by clicking on dropdown while entering value.
 
 <details>
-<summary>Register a member</summary>
+  <summary>Sample Response (Click to Toggle)</summary>
 
-**Method:** POST
+  ```json
+  {
+      "success": true,
+      "member": {
+          "email": "xavier1@gmail.com",
+          "phone": 1234567890,
+          "countryCode": 91,
+          "pass": "$2a$10$iWhpH1vT9tZ8VBEOkKo1jeiJcf.bG0mPuTS0LCcklTqPo.C8Md5a.",
+          "role": "student",
+          "rollno": "20-CSE-4367",
+          "name": "xavier",
+          "semester": "Sem1",
+          "imageurl": {
+              "public_id": "oeiuytgqxdvdtdhoj1t8",
+              "url": "https://res.cloudinary.com/dynrax8dt/image/upload/v1735474409/oeiuytgqxdvdtdhoj1t8.jpg"
+          },
+          "address": "random address",
+          "batchYear": 2020,
+          "fathername": "Beluga",
+          "registrationNo": "1234567890",
+          "dateOfBirth": "2002-10-10T00:00:00.000Z",
+          "age": 22,
+          "verified": false,
+          "createdAt": "2024-12-29T12:13:29.319Z",
+          "branch": "CSE",
+          "randomPass": null,
+          "_id": "67713ce9f661a390e70a0de4",
+          "resetPasswordExpire": "2024-12-29T12:13:29.319Z",
+          "professionalExperience": [],
+          "__v": 0
+      },
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzEzY2U5ZjY2MWEzOTBlNzBhMGRlNCIsImlhdCI6MTczNTQ3NDQwOSwiZXhwIjoxNzQ4NDM0NDA5fQ.DHkQGyZc90CyQyA0Wp5ohzZskYewpGqDl2ND7e8r6v8"
+  }
+```
+</details>
 
-**Endpoint:** `http://localhost:4000/api/v1/register`
 
-**Data:**
 
+### Login
+
+```bash
+POST /api/v1/login
+```
+
+#### Required
+
+- **email** `@type(string) @unique @required` -> `"xavier@example.com"`
+- **pass** `@type(string) @required @minLength(8)` -> `"1234567890"`
+
+Send these as  `Raw JSON` from the body
+
+<details>
+  <summary>Sample Response (Click to Toggle)</summary>
+
+  ```json
+ {
+    "success": true,
+    "member": {
+        "imageurl": {
+            "public_id": "oeiuytgqxdvdtdhoj1t8",
+            "url": "https://res.cloudinary.com/dynrax8dt/image/upload/v1735474409/oeiuytgqxdvdtdhoj1t8.jpg"
+        },
+        "_id": "67713ce9f661a390e70a0de4",
+        "email": "xavier1@gmail.com",
+        "phone": 1234567890,
+        "countryCode": 91,
+        "pass": "$2a$10$iWhpH1vT9tZ8VBEOkKo1jeiJcf.bG0mPuTS0LCcklTqPo.C8Md5a.",
+        "role": "student",
+        "rollno": "20-CSE-4367",
+        "name": "xavier",
+        "semester": "Sem1",
+        "address": "random address",
+        "batchYear": 2020,
+        "fathername": "Beluga",
+        "registrationNo": "1234567890",
+        "dateOfBirth": "2002-10-10T00:00:00.000Z",
+        "age": 22,
+        "verified": false,
+        "createdAt": "2024-12-29T12:13:29.319Z",
+        "branch": "CSE",
+        "randomPass": null,
+        "resetPasswordExpire": "2024-12-29T12:13:29.319Z",
+        "professionalExperience": [],
+        "__v": 0
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzEzY2U5ZjY2MWEzOTBlNzBhMGRlNCIsImlhdCI6MTczNTQ3NTA0NCwiZXhwIjoxNzQ4NDM1MDQ0fQ.1zg_IGJlZW2xfMbH7zz-0DXRaMj16D_ugvHqh9cEWyc"
+}
+```
+</details>
+
+### Delete/Update/Get a user
+
+```bash
+DELETE /api/v1/admin/user/id
+PUT /api/v1/admin/user/id
+GET /api/v1/admin/user/id
+```
+This `id` parameter can be fetched from the `member object` we get after we login or register.
+
+This endpoint also requires `Authorization`**:** `Bearer <auth-token>` in Header or
+{ `token` **:** `Bearer <auth-token>`} in body.
+Only user which has role of `admin` is allowed to delete/update/get the user.
+
+Note: For testing in postman you can directly set the auth token in Authorization tab , select `Bearer` from dropdown and in value add that token.
+
+<details>
+    <summary>Sample Response (click to toggle)</summary>
+        
 ```json
 {
-    "email": "anotheruser@gmail.com",
-    "phone": 9876543210,
-    "countryCode": 91,
-    "pass": "saurav@123",
-    "role": "admin",
-    "rollno": "5678",
-    "name": "saurav",
-    "semester": "first Semester",
-    "imageurl": "https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.webp?s=2048x2048&w=is&k=20&c=X7M3yQkbRq7zIsY16tuaHy8Wu_oo5j-Hp8Uqe7wWxDY=",
-    "address": "456 behal, abcd ",
-    "batchYear": 2019,
-    "fathername": "Father",
-    "registrationNo": "65877536893",
-    "dateOfBirth": "2001-08-20",
-    "age": 22
+    "success": true,
+    "message": "User Deleted Successfully"
+}
+```
+</details>
+
+### Forgot and Reset Password
+
+```bash
+POST /api/v1/password/forgot
+PUT /api/v1/password/reset
+```
+In forgot endpoint `POST` this:
+```json
+{
+    "email":"xavier@gmail.com"
+}
+```
+In reset password endpoint `PUT` this:
+```json
+{
+    "password":"12345678",
+    "confirmPassword":"12345678",
+    "email":"xavier@gmail.com",
+    "randomPass":"i595o5e7"
+}
+```
+
+<details>
+    <summary>Sample Response Forgot Password (click to toggle)</summary>
+        
+```json
+{
+    "success": true,
+    "message": "Email sent to xauravww@gmail.com successfully"
 }
 ```
 </details>
 
 <details>
-<summary>Login a member</summary>
-
-**Method:** POST
-
-**Endpoint:** `http://localhost:4000/api/v1/login`
-
-**Data:**
+    <summary>Sample Response Reset Password (click to toggle)</summary>
+        
 ```json
 {
-    "email": "anotheruser@gmail.com",
-    "pass": "saurav@123"
+    "success": true,
+    "member": {
+        "imageurl": {
+            "public_id": "fu1orucjvbzxggtkll8f",
+            "url": "https://res.cloudinary.com/dynrax8dt/image/upload/v1735474016/fu1orucjvbzxggtkll8f.jpg"
+        },
+        "_id": "67713b60f661a390e70a0de0",
+        "email": "xauravww@gmail.com",
+        "phone": 1234567890,
+        "countryCode": 91,
+        "role": "student",
+        "rollno": "20-CSE-4367",
+        "name": "xavier",
+        "semester": "Sem1",
+        "address": "random address",
+        "batchYear": 2020,
+        "fathername": "Beluga",
+        "registrationNo": "1234567890",
+        "dateOfBirth": "2002-10-10T00:00:00.000Z",
+        "age": 22,
+        "verified": false,
+        "createdAt": "2024-12-29T12:06:56.912Z",
+        "branch": "CSE",
+        "randomPass": null,
+        "resetPasswordExpire": null,
+        "professionalExperience": [],
+        "__v": 0,
+        "pass": "$2a$10$vax4GB5GXHoIFRSSpRDf6Oy/4ZvdwegrJBx1ZM9J/L0QcDJmb3Mea"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzEzYjYwZjY2MWEzOTBlNzBhMGRlMCIsImlhdCI6MTczNTQ4MzAxMywiZXhwIjoxNzQ4NDQzMDEzfQ.orCixXyXHPNR8ZpQEQwiQ6nAEFP-tgw5gnUojjW3ujg"
 }
 ```
 </details>
 
-<details>
-<summary>Create a Status</summary>
 
-**Method:** POST
 
-**Endpoint:** `http://localhost:4000/api/v1/admin/status`
-</details>
 
-<details>
-<summary>Delete Status</summary>
+## Authentication & Authorization
 
-**Method:** DELETE
+- JWT-based authentication (middleware/auth.js)
+- Role-based access control (student/faculty/admin)
+- Protected routes require Bearer token:
 
-**Endpoint:** `http://localhost:4000/api/v1/admin/status/id`
-
-**Data:**
-
-```json
-{
-    "token": "token__here"
-}
+```bash
+Authorization: Bearer <token>
 ```
 
-(Replace `id` with the actual status ID you want to delete)
-</details>
-
-<details>
-<summary>Update Status</summary>
-
-**Method:** PUT
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/status/id`
-
-**Data:**
-```json
-{
-    "name": "John Doe",
-    "rollNo": "2023001",
-    "semester": "Spring 2023",
-    "totalFees": 15000,
-    "pendingFees": 5000,
-    "lateFee": 200,
-    "fine": 100,
-    "bookBank": 300,
-    "title": "Submit Your Due before 31 July",
-    "attendancePercentage": 85,
-    "token": "token__here"
-}
-```
-
-(Replace `id` with the actual status ID you want to update)
-</details>
-
-<details>
-<summary>Get All Status</summary>
-
-**Method:** GET
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/status`
-</details>
-
-<details>
-<summary>Create Attendance</summary>
-
-**Method:** POST
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/attendance`
-
-**Data:**
-```json
-{
-    "memberId": "652637158cc7e023bc6baff3",
-    "date": "2023-10-10T12:00:00.000Z",
-    "status": "present",
-    "remarks": "sick leave",
-    "token": "token__here"
-}
-```
-
-</details>
-
-<details>
-<summary>Delete Attendance</summary>
-
-**Method:** DELETE
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/attendance/_id`
-
-**Data:**
-
-```json
-{
-    "token": "token__here"
-}
-```
-
-(Replace `_id` with the actual attendance ID you want to delete)
-</details>
-
-<details>
-<summary>Update Attendance</summary>
-
-**Method:** PUT
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/attendance/_id`
-
-**Data:**
-
-```json
-{
-    "memberId": "652637158cc7e023bc6baff3",
-    "date": "2023-10-10T12:00:00.000Z",
-    "status": "present",
-    "remarks": "sick leave",
-    "token": "token__here"
-}
-```
-
-
-(Replace `_id` with the actual attendance ID you want to update)
-</details>
-
-<details>
-<summary>Get All Attendance</summary>
-
-**Method:** GET
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/attendance`
-</details>
-
-<details>
-<summary>Gallery</summary>
-
-**Method:** GET
-
-**Endpoint:** `http://localhost:4000/api/v1/gallery`
-
-**Method:** POST
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/gallery`
-
-**Data:**
-
-```json
-{
-    "image": "https://example.com/gallery/image1.jpg",
-    "description": "Brcm Alumi",
-    "tags": ["alumi", "Placement", "2023"],
-    "dateOfUpload": "2023-10-10T12:00:00.000Z",
-    "token": "token__here"
-}
-```
-
-</details>
-
-<details>
-<summary>Delete Gallery</summary>
-
-**Method:** DELETE
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/gallery/id`
-
-**Data:**
-
-```json
-{
-    "token": "token__here"
-}
-```
-(Replace `id` with the actual gallery ID you want to delete)
-</details>
-
-<details>
-<summary>Update Gallery</summary>
-
-**Method:** PUT
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/gallery/id`
-
-**Data:**
-
-```json
-{
-    "image": "https://example.com/gallery/image1.jpg",
-    "description": "Brcm Alumi",
-    "tags": ["alumi", "Placement", "2023"],
-    "dateOfUpload": "2023-10-10T12:00:00.000Z",
-    "token": "token__here"
-}
-```
-
-(Replace `id` with the actual gallery ID you want to update)
-</details>
-
-<details>
-<summary>Events</summary>
-
-**Method:** GET
-
-**Endpoint:** `http://localhost:4000/api/v1/events`
-
-**Method:** POST
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/event`
-
-**Data:**
-
-```json
-{
-    "title": "Tech Conference 2023",
-    "eventLink": "https://google.com",
-    "date": "2023-11-15T09:00:00.000Z",
-    "lastdate": "2023-11-17T18:00:00.000Z",
-    "forSemester": "all",
-    "organisedBy": "Tech Community Association",
-    "image": "company.jpg",
-    "token": "token__here"
-}
-```
-
-</details>
-
-<details>
-<summary>Delete Event</summary>
-
-**Method:** DELETE
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/event/id`
-
-**Data:**
-
-```json
-{
-    "token": "token__here"
-}
-
-```
-
-(Replace `id` with the actual event ID you want to delete)
-</details>
-
-<details>
-<summary>Update Event</summary>
-
-**Method:** PUT
-
-**Endpoint:** `http://localhost:4000/api/v1/admin/event/id`
-
-**Data:**
-
-```json
-{
-    "title": "engineering day patici..",
-    "eventLink": "https://google.com",
-    "date": "2023-11-15T09:00:00.000Z",
-    "lastdate": "2023-11-17T18:00:00.000Z",
-    "forSemester": "all",
-    "organisedBy": "Tech Community Association",
-    "image": "company.jpg",
-    "token": "token__here"
-}
-
-```
-
-(Replace `id` with the actual event ID you want to update)
-</details>
-
-<details>
-<summary>Assignment</summary>
-
-**Method:** GET
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/assignment`
-
-
-**Method:** POST
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/assignment`
-
-**Data:**
-
-```json
-{
-    "title": "dsa",
-    "description": "unit3 part 1",
-    "givenDate": "2023-10-10T12:00:00.000Z",
-    "dueDate": "2023-10-20T12:00:00.000Z",
-    "studentName": "Anmol",
-    "studentRollNo": "4356",
-    "teacherName": "amit",
-    "subject": "dsa",
-    "status": "pending",
-    "attachment": "dsa.pdf",
-    "feedback": "",
-    "grades": null,
-    "submissionDate": null,
-    "lateSubmission": true,
-    "priority": "Medium",
-    "tags": ["dsa", "assignment"],
-    "semester": "3rd",
-    "token": "token__here"
-}
-```
-
-</details>
-
-<details>
-<summary>Delete Assignment</summary>
-
-**Method:** DELETE
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/assignment/id`
-
-**Data:**
-
-```json
-{
-    "token": "token__here"
-}
-```
-
-(Replace `id` with the actual assignment ID you want to delete)
-</details>
-
-<details>
-<summary>Update Assignment</summary>
-
-**Method:** PUT
-
-**Endpoint:** `http://localhost:4000/api/v1/faculty/assignment/id`
-
-**Data:**
-
-```json
-{
-    "title": "NN",
-    "description": "unit3 part 1",
-    "givenDate": "2023-10-10T12:00:00.000Z",
-    "dueDate": "2023-10-20T12:00:00.000Z",
-    "studentName": "Anmol",
-    "studentRollNo": "4356",
-    "teacherName": "amit",
-    "subject": "dsa",
-    "status": "pending",
-    "attachment": "dsa.pdf",
-    "feedback": "",
-    "grades": null,
-    "submissionDate": null,
-    "lateSubmission": true,
-    "priority": "Medium",
-    "tags": ["dsa", "assignment"],
-    "semester": "3rd",
-    "token": "token__here"
-}
-```
-
-(Replace `id` with the actual assignment ID you want to update)
-</details>
-
-# Database Schema
-
-If you're using MongoDB, outline your database schema. Describe the collections, their structure, and how data is organized.
-
-# Testing
-
-Explain how to run tests for your backend. Include instructions for running unit tests, integration tests, and end-to-end tests. You may also mention any testing frameworks or libraries used.
-
-# Deployment
-
-If your project is intended for deployment in production, provide guidance on how to deploy it. This can include instructions for deploying to platforms like AWS, Heroku, or Docker containers.
-
-# Contributing
-
-Explain how others can contribute to your project. Include information about the development workflow, coding standards, and guidelines for submitting pull requests.
-
-# License
-
-Specify the license under which your project is released. This can be an open-source license like MIT, GPL, or any other of your choice.
-
-
-
-
+## Error Handling
+
+### Centralized error handling (middleware/error.js)
+
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 404: Not Found
+- 500: Server Error
+
+## Additional Features
+
+- Cloudinary integration for file storage
+- SMTP email service for notifications
+- Cron job for server maintenance
+- Mongoose data validation
+- Request data sanitization
+
+## Database Models
+
+All database schemas are in the model/ directory:
+
+- Member (login.js)
+- Attendance (attendance.js)
+- Assignment (assignment.js)
+- Event (event.js)
+- TimeTable (timeTable.js)
+- Gallery (gallery.js)
+- CollegeStatus (collegeStatus.js)
+- IDCard (idCard.js)
